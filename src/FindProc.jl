@@ -1,5 +1,8 @@
 module FindProc
 
+include("Format.jl")
+using .Format
+
 export findproc
 
 B = []
@@ -31,7 +34,7 @@ end
 
 # Helper function for findproc -- "vectorizes" the arrays in set S based on B
 function vectorize(S)
-    Set([[count(i->(i==x), s) for x in B] for s in S])
+    S == Nothing ? Nothing : Set([[count(i->(i==x), s) for x in B] for s in S])
 end 
 
 # Helper function for findproc -- "recursively" determines k-size subsets of B[1:i] that sum to T
@@ -78,11 +81,7 @@ end
 
 # Helper function for f -- concatenate e with each element in set S
 function mapCat(S, e)
-    if S == Nothing
-        Nothing
-    else
-        Set([vcat(s, e) for s in S])
-    end
+    S == Nothing ? Nothing : Set([vcat(s, e) for s in S])
 end
 
 end

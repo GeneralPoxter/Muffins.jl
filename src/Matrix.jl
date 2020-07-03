@@ -14,9 +14,10 @@ function solve(m, s)
     set_optimizer_attribute(model, "allowableGap", 1e-5)
     set_optimizer_attribute(model, "cuts", "off")
 
+    fc = fc(m, s)
     @variable(model, 0 <= x[i=1:m, j=1:s] <= 1)
     @variable(model, 0 <= y[i=1:m, j=1:s] <= 1, Int)
-    @variable(model, 1/3 <= z <= fc(m, s), start = fc(m, s))
+    @variable(model, 1/3 <= z <= fc, start = fc)
 
     @objective(model, Max, z)
 

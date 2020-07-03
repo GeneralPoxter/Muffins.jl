@@ -1,0 +1,75 @@
+module Format
+
+using TextWrap
+
+export printf, printfT, printHeader, printEnd, formatFrac, interval, center
+
+LINE_WIDTH = 40
+
+# Formats and outputs a line of text
+function printf(text...)
+    println_wrapped(text..., width=2LINE_WIDTH)
+end
+
+# Formats and outpus a line of text with a theorem reference
+function printfT(theorem, text...)
+    wrapped = join(map( line->wrap(string(line), width=LINE_WIDTH), [text...] ), "\n")
+    lastPos = occursin("\n", wrapped) ? findlast('\n', wrapped) : 0
+    println()
+    print(rpad(wrapped, lastPos + LINE_WIDTH))
+    println(lpad(theorem, LINE_WIDTH))
+    println('-' ^ 2LINE_WIDTH)
+end
+
+# Formats and outputs text as a section header
+function printHeader(text...)
+    println("\n")
+    println(text...)
+    println('-' ^ 2LINE_WIDTH)
+end
+
+# Outputs the end of a procedure
+function printEnd()
+    println(center("END"))
+end
+
+# Formats a Rational type variable into its string representation
+function formatFrac(frac::Rational{Int64})
+    if denominator(frac) == 1
+        numerator(frac)
+    else
+        string(numerator(frac), "/", denominator(frac))
+    end
+end
+
+# Outpus a string interval that concatenates given ranges labeled with given labels
+function interval(rngs...; labels=repeat([" "], length(rngs) - 1))
+    int = ""
+    val = ""
+    w = maximum(length(rng[2]) for rng in rngs) + 1
+    for i in 1:(2length(rngs) - 1)
+        if i % 2 == 0
+            label = labels[Int64(i/2)]
+            int *= label
+            val *= ' ' ^ length(label)
+        else
+            rng = rngs[Int64(ceil(i/2))]
+            int *= center(rng[1], width=w)
+            val *= center(rng[2], width=w)
+        end
+    end
+    center(int, val)
+end
+
+# Centers text within width spaces
+function center(text...; width::Int64 = 2LINE_WIDTH)
+    out = []
+    half = Int64(floor(width/2))
+    for line in text
+        mid = Int64(floor(length(line)/2))
+        append!(out, [lpad(line[1:mid], half) * rpad(line[(mid+1):length(line)], width-half)])
+    end
+    join(out, "\n")
+end
+
+end
