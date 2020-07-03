@@ -32,7 +32,7 @@ function findproc(m, s, alpha)
     println("S = ", S)
 end
 
-# Helper function for findproc -- "vectorizes" the arrays in set S based on B
+# Helper function for findproc -- "vectorizes" arrays in set S based on B
 function vectorize(S)
     S == Nothing ? Nothing : Set([[count(i->(i==x), s) for x in B] for s in S])
 end 

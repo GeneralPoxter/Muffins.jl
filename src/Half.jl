@@ -10,7 +10,7 @@ function half(m, s, proof=true)
     printHeader(center("HALF METHOD"))
 
     if m < s
-        printf("Half Method does not apply")
+        printf("Half Method does not apply", line=true)
         printEnd()
         return Nothing
     elseif m % s == 0
@@ -38,7 +38,7 @@ function half(m, s, proof=true)
         end
     end
 
-    printf("Half Method was inconclusive")
+    printf("Half Method was inconclusive", line=true)
     printEnd()
     alpha
 end
@@ -52,7 +52,7 @@ function output(m, s, alpha, proof)
                 "Upper bound of muffins($m,$s) is $(formatFrac(alpha))")
         printEnd()
     end
-    return alpha
+    alpha
 end
 
 # Helper function for half -- determines whether half(m, s, alpha) is conclusive
@@ -110,7 +110,10 @@ function halfproof(m, s, alpha)
     alpha = formatFrac(alpha)
     alpha1 = formatFrac(alpha1)
     a = formatFrac(m//(V+1)s)
-    b = formatFrac(max(1-m//(W-1)s, 0))
+    b = max(1-m//(W-1)s, 0)
+    b1 = 1-b
+    b = formatFrac(b)
+    b1 = formatFrac(b1)
     c = formatFrac(m//s-x)
     d = formatFrac(m//s-y)
     xF = formatFrac(x)
@@ -120,12 +123,12 @@ function halfproof(m, s, alpha)
     printHeader("OVERVIEW")
     printfT("Goal", 
             "Prove:",
-            "muffins($m,$s) <= alpha = $alpha",
+            "muffins($m,$s) ≤ α = $alpha",
             "by contradicting the assumption")
     printfT("Assumption", 
             "Assume:",
-            "The desired upper bound is alpha",
-            "muffins($m,$s) > alpha >= 1/3")
+            "The desired upper bound is α",
+            "muffins($m,$s) > α ≥ 1/3")
     printfT("Theorem 2.6.2", 
             "Since muffins($m,$s) > 1/3, each muffin must be cut into 2 shs, totaling $(2m) shs")
     printfT("Property of Buddies",
@@ -136,19 +139,21 @@ function halfproof(m, s, alpha)
     printHeader("CASEWORK")
 
     printfT("Case 1",
-            "If Alice has >= $(V+1) shs, then one of them is <= ($size x 1/$(V+1)) = $a",
+            "Alice has ≥ $(V+1) shs",
+            "One of them is ≤ ($size × 1/$(V+1)) = $a",
             "",
-            "Contradicts assumption if alpha >= $a")
+            "Contradicts assumption if α ≥ $a")
 
     if W-1 <= 1 && m/s > 1
         printfT("Case 2",
-                "Bob cannot have <= $(W-1) shs since $size > 1, so this case is impossible")
+                "Bob cannot have ≤ $(W-1) shs since $size > 1, so this case is impossible")
     else
         printfT("Case 2",
-                "If Bob has <= $(W-1) shs, then one of them is >= ($size x 1/$(W-1))",
-                "Its buddy is <= (1 - $size x 1/$(W-1)) = $b",
+                "Bob has ≤ $(W-1) shs",
+                "One of them is ≥ ($size × 1/$(W-1)) = $b1",
+                "Its buddy is ≤ (1 - $b1) = $b",
                 "",
-                "Contradicts assumption if alpha >= $b")
+                "Contradicts assumption if α ≥ $b")
     end
 
     printfT("Note",
@@ -163,17 +168,19 @@ function halfproof(m, s, alpha)
             "So there are $numW $W-shs and $numV $V-shs")
 
     printfT("Case 3",
-            "If Alice has a $V-sh >= $xF, then her other $(V-1) $V-shs sum to <= ($size - $xF) = $c",
-            "One of them is <= ($c x 1/$(V-1)) = $alpha",
+            "Alice has a $V-sh ≥ $xF",
+            "Her other $(V-1) $V-shs sum to ≤ ($size - $xF) = $c",
+            "One of them is ≤ ($c × 1/$(V-1)) = $alpha",
             "",
-            "Contradicts assumption if alpha >= $alpha")
+            "Contradicts assumption if α ≥ $alpha")
 
     printfT("Case 4",
-            "If Bob has a $W-sh <= $yF, then his other $(W-1) $W-shs sum to >= ($size - $yF) = $d",
-            "One of them is >= ($d x 1/$(W-1)) = $alpha1",
-            "Its buddy is <= (1 - $alpha1) = $alpha",
+            "Bob has a $W-sh ≤ $yF",
+            "His other $(W-1) $W-shs sum to ≥ ($size - $yF) = $d",
+            "One of them is ≥ ($d × 1/$(W-1)) = $alpha1",
+            "Its buddy is ≤ (1 - $alpha1) = $alpha",
             "",
-            "Contradicts assumption if alpha >= $alpha")
+            "Contradicts assumption if α ≥ $alpha")
 
     println()
     printf("The following intervals capture the negation of the previous cases:")
@@ -205,15 +212,15 @@ function halfproof(m, s, alpha)
     
     # Conclude with alpha's value
     printHeader("CONCLUSION")
-    printfT("Compute alpha",
-            "Each possible case derives a lower bound for alpha that contradicts the assumption",
+    printfT("Compute α",
+            "Each possible case derives a lower bound for α that contradicts the assumption",
             "",
             "All possible cases contradict the assumption iff.",
-            "alpha >= max($a, $b, $alpha) = $alpha")
+            "α ≥ max($a, $b, $alpha) = $alpha")
     printfT("Conclusion",
-            "Therefore, muffins($m, $s) <= alpha for all alpha >= $alpha",
+            "muffins($m, $s) ≤ α, ∀ α ≥ $alpha",
             "",
-            "muffins($m, $s) <= $alpha")
+            "muffins($m, $s) ≤ $alpha")
 
     printEnd()
 end

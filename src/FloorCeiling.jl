@@ -9,7 +9,7 @@ export fc
 function fc(m, s)
     printHeader(center("FLOOR-CEILING THEOREM"))
     if m < s
-        printf("Floor-Ceiling Theorem does not apply")
+        printf("Floor-Ceiling Theorem does not apply", line=true)
         printEnd()
         Nothing
     else
