@@ -2,7 +2,7 @@ module Format
 
 using TextWrap
 
-export printf, printfT, printHeader, printEnd, formatFrac, interval, center
+export printf, printfT, printHeader, printEnd, printLine, formatFrac, toFrac, interval, center
 
 LEFT_WIDTH = 45
 RIGHT_WIDTH = 25
@@ -12,30 +12,35 @@ LINE_WIDTH = LEFT_WIDTH + RIGHT_WIDTH
 function printf(text...; line=false)
     println_wrapped(text..., width=LINE_WIDTH)
     if line
-        println('—' ^ LINE_WIDTH)
+        printLine()
     end
 end
 
 # Formats and outpus a line of text with a theorem reference
 function printfT(theorem, text...)
-    wrapped = join(map( line->wrap(string(line), width=LEFT_WIDTH), [text...] ), "\n")
+    wrapped = join(map( line->wrap(string(line), width=LEFT_WIDTH, break_on_hyphens=false), [text...] ), "\n")
     lastPos = occursin("\n", wrapped) ? findlast('\n', wrapped) : 0
     println()
     print(rpad(wrapped, lastPos + LEFT_WIDTH))
     println(lpad(theorem, RIGHT_WIDTH))
-    println('—' ^ LINE_WIDTH)
+    printLine()
 end
 
 # Formats and outputs text as a section header
 function printHeader(text...)
     println("\n")
     println(text...)
-    println('—' ^ LINE_WIDTH)
+    printLine()
 end
 
 # Outputs the end of a procedure
 function printEnd()
     println(center("END"))
+end
+
+# Outputs a section separator
+function printLine()
+    println('—' ^ LINE_WIDTH)
 end
 
 # Formats a Rational type variable into its string representation
@@ -44,6 +49,16 @@ function formatFrac(frac::Rational{Int64})
         numerator(frac)
     else
         string(numerator(frac), "/", denominator(frac))
+    end
+end
+
+# Converts a string representation into a Rational type variable
+function toFrac(frac::String)
+    try
+        f = vcat(map(x->parse(Int64, x), split(frac, "/")), [1])
+        f[1]//f[2]
+    catch e
+        frac
     end
 end
 

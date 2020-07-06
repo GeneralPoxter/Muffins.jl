@@ -1,5 +1,8 @@
 module Half
 
+include("Computation.jl")
+using .Computation
+
 include("Format.jl")
 using .Format
 
@@ -21,16 +24,18 @@ function half(m, s, proof=true)
     end
 
     (V, W, sV, sW) = sv(m, s)
+    numV = (V)sV
+    numW = (W)sW
 
     # Derive alpha using Half Algorithm
     alpha = 1
-    if (W)sW > (V)sV
+    if numW > numV
         alpha = 1 - (m//s-1//2)//(V-2)
         alpha = alpha < 1/3 ? 1//3 : alpha
         if vhalf(m, s, alpha)
             return output(m, s, alpha, proof)
         end
-    elseif (W)sW < (V)sV
+    elseif numW < numV
         alpha = (m//s-1//2)//(V-1)
         alpha = alpha < 1/3 ? 1//3 : alpha
         if vhalf(m, s, alpha)
@@ -63,7 +68,7 @@ function vhalf(m, s, alpha)
         (V, W, sV, sW) = sv(m, s)
 
         if m//s * 1//(V+1) > alpha || 1 - m//s * 1//(V-2) > alpha
-            false
+            return false
         end
 
         ((_, x), (y, _)) = findend(m, s, alpha, V)
@@ -78,29 +83,13 @@ function vhalf(m, s, alpha)
     end
 end
 
-# Helper function for half -- determines V, V -1 (abbreviated as W), s_V, and s_W
-function sv(m, s)
-    # Apply V-Conjecture
-    V = Int64(ceil(2m/s))
-    W = V-1
-    sV = (-W)s + 2m
-    sW = (V)s - 2m
-    (V, W, sV, sW)
-end
-
-# Helper function for half -- determines the segments of the interval for the last case
-function findend(m, s, alpha, V)
-    y = m//s - (1-alpha)*(V-2)
-    y = y >= 1-alpha ? 1-alpha : (y <= alpha ? alpha : y)
-
-    x = m//s - alpha*(V-1)
-    x = x <= alpha ? alpha : (x >= 1-alpha ? 1-alpha : x)
-
-    ((alpha, x), (y, 1-alpha))
-end
-
 # Helper function for half -- generates proof of Half Method
 function halfproof(m, s, alpha)
+    if !vhalf(m, s, alpha)
+        printf("Cannot generate proof with given input")
+        return
+    end
+
     # Define and format variables for proof
     (V, W, sV, sW) = sv(m, s)
     numV = (V)sV
