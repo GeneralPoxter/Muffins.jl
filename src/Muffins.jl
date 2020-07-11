@@ -19,7 +19,7 @@ using .FindProc
 export muffins
 
 # Solves muffin problem for m muffins and s students -- Work in progress 
-function muffins(m, s)
+function muffins(m::Int64, s::Int64)
     # TODO -- add case where m < s
     alpha = min(fc(m, s), half(m, s), int(m, s))
     findproc(m, s, alpha)

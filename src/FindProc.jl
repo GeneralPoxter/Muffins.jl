@@ -9,7 +9,7 @@ B = []
 memo = Dict()
 
 # Determines procedure with minimum piece size alpha -- Work in progress
-function findproc(m, s, alpha)
+function findproc(m::Int64, s::Int64, alpha::Rational{Int64})
     # Clear globals
     global B = []
     global memo = Dict()

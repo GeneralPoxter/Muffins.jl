@@ -6,7 +6,7 @@ using .Format
 export fc
 
 # Determines upper bound with Floor-Ceiling Theorem
-function fc(m, s)
+function fc(m::Int64, s::Int64)
     printHeader(center("FLOOR-CEILING THEOREM"))
     if m < s
         printf("Floor-Ceiling Theorem does not apply", line=true)
