@@ -38,6 +38,7 @@ end
 
 # Outputs the end of a procedure
 function printEnd()
+    println()
     println(center("END"))
 end
 

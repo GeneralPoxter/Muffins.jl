@@ -12,9 +12,8 @@ using .Int
 include("FindProc.jl")
 using .FindProc
 
-# Matrix solver disabled until optimized
-# include("Matrix.jl")
-# using .Matrix
+include("Matrix.jl")
+using .Matrix
 
 export muffins
 
