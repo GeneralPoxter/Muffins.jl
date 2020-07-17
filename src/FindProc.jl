@@ -56,21 +56,11 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64})
 
         # Solve for natural number solutions
         for i=1:length(M)
-            @objective(model, Max, x[i])
-            optimize!(model)
-            append!(solutions, [[value.(x), value.(y)]])
-
             @objective(model, Min, x[i])
             optimize!(model)
             append!(solutions, [[value.(x), value.(y)]])
-        end
-
-        for i=1:length(S)
-            @objective(model, Max, y[i])
-            optimize!(model)
-            append!(solutions, [[value.(x), value.(y)]])'
-
-            @objective(model, Min, y[i])
+            
+            @objective(model, Max, x[i])
             optimize!(model)
             append!(solutions, [[value.(x), value.(y)]])
         end

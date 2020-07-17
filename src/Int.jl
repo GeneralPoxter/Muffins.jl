@@ -29,18 +29,21 @@ function int(m::Int64, s::Int64, proof::Bool=true)
 
     # Derive alpha using Int Algorithm
     if numW > numV
-        f = Int64(floor(numV/sW))
-        alpha = min(((W-f)W - (W-f+1)m//s + f)//((W-f-1)W + 2f),
-                    ((V)m//s - V - (W-f-3)W -2f -1)//((V -2W +2f +2)W - f - 1))
+        f = Int64(floor(numV/sW))                                   # Upper bound of minimum # of large W-shs a student can have
+        g = Int64(floor((numW-numV)/sW))                            # Lower bound of minimum # of small W-shs a student can have
+        alpha = min(((W-f)W - (W-f+1)m//s + f)//((W-f-1)W + 2f),    # Value for alpha derived by solving f(1-α) + (W-f)(1-y) = m/s
+                    ((g-1)W + (W -2g+1)m//s)//(W^2 - g))            # Value for alpha derived by solving gy + (W-g)(1-x) = m/s
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vint(m, s, alpha)
+        if vint(m, s, alpha, proof)
             return alpha
         end
     elseif numW < numV
-        f = Int64(floor((numV-numW)/sV))
-        alpha = ((V-f)W + (2f -V-1)m//s)//((V-f)W + (f-1)V)
+        f = Int64(floor((numV-numW)/sV))                            # Upper bound of minimum # of large V-shs a student can have
+        g = Int64(floor(numW/sV))                                   # Lower bound of minimum # of small V-shs a student can have
+        alpha = min(((V-f)W + (2f -V-1)m//s)//((V-f)W + (f-1)V),    # Value for alpha derived by solving f(1-x) + (V-f)(1-y) = m/s
+                    ((V-g+1)m//s + g - V)//((V-g-1)V + 2g))         # Value for alpha derived by solving gα + (V-g)(1-x) = m/s
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vint(m, s, alpha)
+        if vint(m, s, alpha, proof)
             return alpha
         end
     end
@@ -57,7 +60,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
         false
     elseif alpha < 1/3
         printfT("Theorem 4.5", 
-            "For m ≥ s, α must be ≥ 1/3")
+                "For m ≥ s, α must be ≥ 1/3")
         false
     elseif alpha > 1
         printfT("",
@@ -146,6 +149,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                     "Contradicts assumption if α ≥ $alphaF")
 
             printHeader("CASE 3: INTERVAL ANALYSIS")
+            println()
             printf("The following intervals capture the negation of the previous cases:")
             if x <= y && xF > alphaF && yF < alpha1
                 println("\n",
@@ -197,14 +201,14 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
             diff = abs(numV-numW)
 
             (vMin, vMax, sMin, sMax) = (V, W, sV, sW)
-            f = Int64(floor(numV/sW))
-            lim = (vMin)sMin
+            (f, g) = (Int64(floor(numV/sW)), Int64(floor(diff/sW)))
+            (lim1, lim2) = ((vMin)sMin, diff)
             (i, j, k, l) = (xF, yF, y1, x1)
             (rngMin, rngMax, rngS, rngL) = ((alphaF, xF), (x1, alpha1), (yF, y1), (x1, alpha1))
             if numV > numW
                 (vMin, vMax, sMin, sMax) = (W, V, sW, sV)
-                f = Int64(floor(diff/sV))
-                lim = diff
+                (f, g) = (Int64(floor(diff/sV)), Int64(floor(numW/sV)))
+                (lim1, lim2) = (lim2, lim1)
                 (i, j, k, l) = (y1, x1, xF, yF)
                 (rngMin, rngMax, rngS, rngL) = ((yF, alpha1), (alphaF, yF), (alphaF, y1), (x1, xF))
             end
@@ -215,6 +219,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                     "Because $numMin $vMin-shs lie in ($(rngMin[1]),$(rngMin[2])), $numMin $vMax-shs must lie in ($(rngMax[1]),$(rngMax[2]))",
                     "",
                     "Similary, the gap that lies in [$xF,$yF] implies a gap that lies in [$y1,$x1]")
+            println()
             printf("The following intervals capture the previous statements:")
             println("\n",
                     interval(["(", alphaF],
@@ -227,36 +232,59 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
             printLine()
 
             printfT("Note",
-                    "Let the $vMax-shs that lie in ($(rngS[1]),$(rngS[2])) be small-shs",
-                    "Let the $vMax-shs that lie in ($(rngL[1]),$(rngL[2])) be large-shs")
+                    "Let the $vMax-shs that lie in ($(rngS[1]),$(rngS[2])) be small $vMax-shs",
+                    "Let the $vMax-shs that lie in ($(rngL[1]),$(rngL[2])) be large $vMax-shs")
 
-            printfT("Case 3.1",
-                    "All $sMax $vMax-sh students have at least $(f+1) large-shs",
-                    "",
-                    "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim")
-                
             upperB = (vMax-f)*toFrac(rngS[2]) + (f)*toFrac(rngL[2])
+            lowerB = (vMax-g)*toFrac(rngL[1]) + (g)*toFrac(rngS[1])
             u = formatFrac(upperB, cd)
+            l = formatFrac(lowerB, cd)
+
             if upperB <= m//s
+                printfT("Case 3.1",
+                        "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
+                        "",
+                        "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim1")
                 printfT("Case 3.2",
-                        "Alice has ≤ $f large-shs",
-                        "She must also have ≥ $(vMax-f) small-shs, so her maximum amount of muffins is:",
+                        "∃ student Alice with ≤ $f large $vMax-shs",
+                        "She must also have ≥ $(vMax-f) small $vMax-shs, so her maximum amount of muffins is:",
                         "< ($(vMax-f) × $(rngS[2])) + ($f × $(rngL[2])) = $u",
                         "",
                         "Since Alice's muffin amount can not reach $size, this case is impossible")
-            else
-                lowerB = (vMax)*toFrac(rngS[1])
-                l = formatFrac(lowerB, cd)
+            elseif lowerB >= m//s
+                printfT("Case 3.1",
+                        "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
+                        "",
+                        "This is impossible because $(g+1)×$sMax = $((g+1)sMax) ≥ $lim2")
                 printfT("Case 3.2",
-                        "Alice has ≤ $f large-shs",
-                        "She must also have ≥ $(vMax-f) small-shs, so her possible muffin amount lies in:",
+                        "∃ student Bob with ≤ $g small $vMax-shs",
+                        "He must also have ≥ $(vMax-g) large $vMax-shs, so his minimum amount of muffins is:",
+                        "> ($g × $(rngS[1])) + ($(vMax-g) × $(rngL[1])) = $l",
                         "",
-                        "($vMax×$(rngS[1]), $(vMax-f)×$(rngS[2]) + $f×$(rngL[2]))",
-                        "= ($l, $u)",
+                        "Since Bob's muffin amount can not reach $size, this case is impossible")
+            else 
+                printfT("Case 3.1",
+                        "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                         "",
-                        "Since $size lies in this interval, this case is possible",
+                        "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim1")
+                printfT("Negation of Case 3.1",
+                        "∃ student Alice with ≤ $f large $vMax-shs",
+                        "She must also have ≥ $(vMax-f) small $vMax-shs, so her maximum amount of muffins is:",
+                        "< ($(vMax-f) × $(rngS[2])) + ($f × $(rngL[2])) = $u",
                         "",
-                        "Contradicts assumption if α ≥ $alphaF")
+                        "Since $size lies below the upper bound, this case is inconclusive")
+                printfT("Case 3.2",
+                        "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
+                        "",
+                        "This is impossible because $(g+1)×$sMax = $((g+1)sMax) ≥ $lim2")
+                printfT("Negation of Case 3.2",
+                        "∃ student Bob with ≤ $g small $vMax-shs",
+                        "He must also have ≥ $(vMax-g) large $vMax-shs, so his minimum amount of muffins is:",
+                        "> ($g × $(rngS[1])) + ($(vMax-g) × $(rngL[1])) = $l",
+                        "",
+                        "Since $size lies above the lower bound, this case is inconclusive")
+                printf("Interval analysis inconclusive, VInt failed", line=true)
+                return false
             end
         end
 
@@ -276,7 +304,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                     "muffins($m,$s) ≤ $alpha")
         else
             printfT("Interval Method",
-                    "Upper bound of muffins($m,$s) is $(formatFrac(alpha))")
+                    "Upper bound of muffins($m,$s) is $alpha")
         end
         printEnd()
 

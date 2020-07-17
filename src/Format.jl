@@ -19,7 +19,7 @@ function printf(text...; line=false)
     end
 end
 
-# Formats and outpus a line of text with a theorem reference
+# Formats and outputs a line of text with a theorem reference
 function printfT(theorem, text...)
     wrapped = join(map( line->wrap(string(line), width=LEFT_WIDTH, break_on_hyphens=false), [text...] ), "\n")
     lastPos = occursin("\n", wrapped) ? findlast('\n', wrapped) : 0
@@ -50,6 +50,9 @@ end
 # Formats a Rational type variable into its string representation
 function formatFrac(frac::Rational{Int64}, den=denominator(frac))
     (n, d) = (numerator(frac), denominator(frac))
+    if n == 0
+        return 0
+    end
     m = den % d == 0 ? Int64(den/d) : 1
     string(m * n, "/", m * d)
 end
