@@ -29,13 +29,13 @@ function half(m::Int64, s::Int64, proof::Bool=true)
 
     # Derive alpha using Half Algorithm
     if numW > numV
-        alpha = 1 - (m//s-1//2)//(V-2)
+        alpha = 1 - (m//s-1//2)//(V-2)          # Value for alpha derived by solving y = 1/2
         alpha = alpha < 1/3 ? 1//3 : alpha
         if vhalf(m, s, alpha, proof)
             return alpha
         end
     elseif numW < numV
-        alpha = (m//s-1//2)//(V-1)
+        alpha = (m//s-1//2)//(V-1)              # Value for alpha derived by solving x = 1/2
         alpha = alpha < 1/3 ? 1//3 : alpha
         if vhalf(m, s, alpha, proof)
             return alpha

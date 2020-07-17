@@ -283,8 +283,37 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                         "> ($g × $(rngS[1])) + ($(vMax-g) × $(rngL[1])) = $l",
                         "",
                         "Since $size lies above the lower bound, this case is inconclusive")
-                printf("Interval analysis inconclusive, VInt failed", line=true)
-                return false
+
+                printf("Bounding # of large and small $vMax-shs inconclusive, proceeding with individual case analysis", line=true)
+                for k=0:vMax
+                    upperB = (vMax-k)*toFrac(rngL[2]) + (k)*toFrac(rngS[2])
+                    lowerB = (vMax-k)*toFrac(rngL[1]) + (k)*toFrac(rngS[1]) 
+                    u = formatFrac(upperB, cd)
+                    l = formatFrac(lowerB, cd)
+                    if upperB <= m//s || lowerB >= m//s
+                        printfT("Case 3.$(k+3)",
+                                "Alice has $k small $vMax-shs and $(vMax-k) large $vMax-shs",
+                                "Her possible muffin amount lies in:",
+                                "",
+                                "($k × $(rngS[1]) + $(vMax-k) × $(rngL[1]),",
+                                "$k × $(rngS[2]) + $(vMax-k) × $(rngL[2]))",
+                                "= ($l, $u)",
+                                "",
+                                "Since $size lies outside this interval, this case is impossible")
+                    else
+                        printfT("Case 3.$(k+3)",
+                                "Bob has $k small $vMax-shs and $(vMax-k) large $vMax-shs",
+                                "His possible muffin amount lies in:",
+                                "",
+                                "($k × $(rngS[1]) + $(vMax-k) × $(rngL[1]),",
+                                "$k × $(rngS[2]) + $(vMax-k) × $(rngL[2]))",
+                                "= ($l, $u)",
+                                "",
+                                "Since $size lies inside this interval, this case is inconclusive")
+                        printf("Interval analysis inconclusive, VInt failed", line=true)
+                        return false
+                    end
+                end
             end
         end
 
