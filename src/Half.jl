@@ -42,7 +42,7 @@ function half(m::Int64, s::Int64, proof::Bool=true)
         end
     end
 
-    printf("V-Conjecture inconclusive, Half Method inconclusive", line=true)
+    printf("Half Method inconclusive", line=true)
     printEnd()
     1
 end
@@ -121,25 +121,24 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
 
         ((_, x), (y, _)) = findend(m, s, alpha, V)
 
-        # Check if V-Conjecture works
-        if (m//s-x) * 1//(V-1) != alpha || 1 - (m//s-y) * 1//(W-1) != alpha
-            printf("V-Conjecture inconclusive, VHalf failed", line=true)
+        # Check if FindEnd works
+        if x == alpha && y == 1-alpha
+            printf("FindEnd inconclusive, VHalf failed", line=true)
             return false
         end
 
-        # Continue proof
+        # Define and format variables for proof
         cd = lcm(s, denominator(x), denominator(y))
-        genInt = true
-        if proof
-            # Define and format variables for proof
-            alphaF = formatFrac(alpha, cd)
-            alpha1 = formatFrac(1-alpha, cd)
-            size = formatFrac(m//s, cd)
-            c = formatFrac(m//s-x, cd)
-            d = formatFrac(m//s-y, cd)
-            xF = formatFrac(x, cd)
-            yF = formatFrac(y, cd)
+        alphaF = formatFrac(alpha, cd)
+        alpha1 = formatFrac(1-alpha, cd)
+        size = formatFrac(m//s, cd)
+        c = formatFrac(m//s-x, cd)
+        d = formatFrac(m//s-y, cd)
+        xF = formatFrac(x, cd)
+        yF = formatFrac(y, cd)
 
+        # Continue proof
+        if proof
             # Continue casework
             printfT("Note",
                     "The remaining cases deal with everyone having either $W or $V shs, so:",
@@ -151,25 +150,35 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                     "The solution to the system is:",
                     "s_$W = $sW, s_$V = $sV",
                     "So there are $numW $W-shs and $numV $V-shs")
+            
+            if x != alpha
+                printfT("Case 3",
+                        "Alice has a $V-sh ≥ $xF",
+                        "Her other $(V-1) $V-shs sum to ≤ ($size - $xF) = $c",
+                        "One of them is ≤ ($c × 1/$(V-1)) = $alphaF",
+                        "",
+                        "Contradicts assumption if α ≥ $alphaF")
+            else
+                printfT("Case 3",
+                        "FindEnd did not produce a conclusive bound for $V-shs")
+            end
 
-            printfT("Case 3",
-                    "Alice has a $V-sh ≥ $xF",
-                    "Her other $(V-1) $V-shs sum to ≤ ($size - $xF) = $c",
-                    "One of them is ≤ ($c × 1/$(V-1)) = $alphaF",
-                    "",
-                    "Contradicts assumption if α ≥ $alphaF")
-
-            printfT("Case 4",
-                    "Bob has a $W-sh ≤ $yF",
-                    "His other $(W-1) $W-shs sum to ≥ ($size - $yF) = $d",
-                    "One of them is ≥ ($d × 1/$(W-1)) = $alpha1",
-                    "Its buddy is ≤ (1 - $alpha1) = $alphaF",
-                    "",
-                    "Contradicts assumption if α ≥ $alphaF")
+            if y != 1-alpha
+                printfT("Case 4",
+                        "Bob has a $W-sh ≤ $yF",
+                        "His other $(W-1) $W-shs sum to ≥ ($size - $yF) = $d",
+                        "One of them is ≥ ($d × 1/$(W-1)) = $alpha1",
+                        "Its buddy is ≤ (1 - $alpha1) = $alphaF",
+                        "",
+                        "Contradicts assumption if α ≥ $alphaF")
+            else
+                printfT("Case 4",
+                        "Findend did not produce a conclusive bound for $W-shs")
+            end
 
             println()
             printf("The following intervals capture the negation of the previous cases:")
-            if x <= y && xF > alphaF && yF < alpha1
+            if x <= y && x > alpha && y < 1-alpha
                 println("\n",
                         interval(["(", alphaF],
                                 [")[", xF],
@@ -181,7 +190,6 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                         center("There is no conclusive negation"))
                 printfT("Case 5",
                         "This case does not exist")
-                genInt = false
             else
                 if xF != alphaF
                     println("\n",
@@ -200,19 +208,19 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
             end
         end
 
-        # Conclude Case 5 (interval case)
+        # Conclude interval case
         half = formatFrac(1//2, cd)
         if x <= 1/2 && numV > m
-            if proof && genInt
+            if proof
                 printfT("Case 5",
                         "This case is impossible because there are more than $m shares ≤ $half, which violates the Property of Buddies")
             end
         elseif y >= 1/2 && numW > m
-            if proof && genInt
+            if proof
                 printfT("Case 5",
                         "This case is impossible because there are more than $m shares ≥ $half, which violates the Property of Buddies")
             end
-        elseif genInt
+        else
             # Fail if intervals inconclusive
             if proof
                 printfT("Case 5",

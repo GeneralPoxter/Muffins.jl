@@ -48,7 +48,7 @@ function int(m::Int64, s::Int64, proof::Bool=true)
         end
     end
 
-    printf("V-Conjecture inconclusive, Interval Method inconclusive", line=true)
+    printf("Interval Method inconclusive", line=true)
     printEnd()
     1
 end
@@ -101,25 +101,27 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
 
         ((_, x), (y, _)) = findend(m, s, alpha, V)
 
-        # Check if V-Conjecture works
-        if (m//s-x) * 1//(V-1) != alpha || 1 - (m//s-y) * 1//(W-1) != alpha
-            printf("V-Conjecture inconclusive, VInt failed", line=true)
+        # Check if FindEnd works
+        if x == alpha && y == 1-alpha
+            printf("FindEnd inconclusive, VInt failed", line=true)
             return false
         end
 
-        # Continue proof
+        # Define and format variables for proof
         cd = lcm(s, denominator(x), denominator(y))
-        genInt = true
-        if proof
-            # Define and format variables for proof
-            alphaF = formatFrac(alpha, cd)
-            alpha1 = formatFrac(1-alpha, cd)
-            size = formatFrac(m//s, cd)
-            a = formatFrac(m//s-x, cd)
-            b = formatFrac(m//s-y, cd)
-            xF = formatFrac(x, cd)
-            yF = formatFrac(y, cd)
+        alphaF = formatFrac(alpha, cd)
+        alpha1 = formatFrac(1-alpha, cd)
+        size = formatFrac(m//s, cd)
+        a = formatFrac(m//s-x, cd)
+        b = formatFrac(m//s-y, cd)
+        xF = formatFrac(x, cd)
+        x1 = formatFrac(1-x, cd)
+        yF = formatFrac(y, cd)
+        y1 = formatFrac(1-y, cd)
+        diff = abs(numV-numW)
 
+        # Continue proof
+        if proof
             # Describe casework
             printHeader("CASEWORK")
 
@@ -134,24 +136,35 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                     "s_$W = $sW, s_$V = $sV",
                     "So there are $numW $W-shs and $numV $V-shs")
 
-            printfT("Case 1",
-                    "Alice has a $V-sh ≥ $xF",
-                    "Her other $(V-1) $V-shs sum to ≤ ($size - $xF) = $a",
-                    "One of them is ≤ ($a × 1/$(V-1)) = $alphaF",
-                    "",
-                    "Contradicts assumption if α ≥ $alphaF")
-            printfT("Case 2",
-                    "Bob has a $W-sh ≤ $yF",
-                    "His other $(W-1) $W-shs sum to ≥ ($size - $yF) = $b",
-                    "One of them is ≥ ($b × 1/$(W-1)) = $alpha1",
-                    "Its buddy is ≤ (1 - $alpha1) = $alphaF",
-                    "",
-                    "Contradicts assumption if α ≥ $alphaF")
+            if x != alpha
+                printfT("Case 1",
+                        "Alice has a $V-sh ≥ $xF",
+                        "Her other $(V-1) $V-shs sum to ≤ ($size - $xF) = $a",
+                        "One of them is ≤ ($a × 1/$(V-1)) = $alphaF",
+                        "",
+                        "Contradicts assumption if α ≥ $alphaF")
+            else
+                printfT("Case 1",
+                        "FindEnd did not produce a conclusive bound for $V-shs")
+            end
+
+            if y != 1-alpha
+                printfT("Case 2",
+                        "Bob has a $W-sh ≤ $yF",
+                        "His other $(W-1) $W-shs sum to ≥ ($size - $yF) = $b",
+                        "One of them is ≥ ($b × 1/$(W-1)) = $alpha1",
+                        "Its buddy is ≤ (1 - $alpha1) = $alphaF",
+                        "",
+                        "Contradicts assumption if α ≥ $alphaF")
+            else
+                printfT("Case 2",
+                        "FindEnd did not produce a conclusive bound for $W-shs")
+            end
 
             printHeader("CASE 3: INTERVAL ANALYSIS")
             println()
             printf("The following intervals capture the negation of the previous cases:")
-            if x <= y && xF > alphaF && yF < alpha1
+            if x <= y && x > alpha && y < 1-alpha
                 println("\n",
                         interval(["(", alphaF],
                                 [")[", xF],
@@ -159,12 +172,6 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                                 [")", alpha1],
                                 labels=["$numV $V-shs", "0", "$numW $W-shs"]))
                 printLine()
-            elseif xF == alphaF && yF == alpha1
-                println("\n",
-                            center("There is no conclusive negation"))
-                printfT("Case 3",
-                        "This case does not exist")
-                genInt = false
             else
                 if xF != alphaF
                     println("\n",
@@ -180,41 +187,35 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                                     [")", alpha1],
                                     labels=["0 $W-shs", "$numW $W-shs"]))
                 end
-                
-                # Fail if intervals inconclusive
-                if proof
-                    printfT("Case 3",
-                            "The Interval Method is inconclusive on these intervals, VInt failed")
-                else
-                    printf("Could not generate conclusive interval, VInt failed", line=true)
-                end
 
-                return false
+                printfT("Case 3",
+                        "The Interval Method is inconclusive on these intervals, VInt failed")
             end
         end
 
-        # Conclude Case 3 (interval case)
-        if proof && genInt
-            # Define and format variables for proof
-            x1 = formatFrac(1-x, cd)
-            y1 = formatFrac(1-y, cd)
-            diff = abs(numV-numW)
+        # Fail if interval inconclusive
+        if x > y || x == alpha || y == 1-alpha
+            !proof && printf("Could not generate conclusive interval, VInt failed", line=true)
+            return false
+        end
 
-            (vMin, vMax, sMin, sMax) = (V, W, sV, sW)
-            (f, g) = (Int64(floor(numV/sW)), Int64(floor(diff/sW)))
-            (lim1, lim2) = ((vMin)sMin, diff)
-            (i, j, k, l) = (xF, yF, y1, x1)
-            (rngMin, rngMax, rngS, rngL) = ((alphaF, xF), (x1, alpha1), (yF, y1), (x1, alpha1))
-            if numV > numW
-                (vMin, vMax, sMin, sMax) = (W, V, sW, sV)
-                (f, g) = (Int64(floor(diff/sV)), Int64(floor(numW/sV)))
-                (lim1, lim2) = (lim2, lim1)
-                (i, j, k, l) = (y1, x1, xF, yF)
-                (rngMin, rngMax, rngS, rngL) = ((yF, alpha1), (alphaF, yF), (alphaF, y1), (x1, xF))
-            end
-            numMin = (vMin)sMin
+        # Define and format variables for proof
+        (vMin, vMax, sMin, sMax) = (V, W, sV, sW)
+        (f, g) = (Int64(floor(numV/sW)), Int64(floor(diff/sW)))
+        (lim1, lim2) = ((vMin)sMin, diff)
+        (i, j, k, l) = (xF, yF, y1, x1)
+        (rngMin, rngMax, rngS, rngL) = ((alphaF, xF), (x1, alpha1), (yF, y1), (x1, alpha1))
+        if numV > numW
+            (vMin, vMax, sMin, sMax) = (W, V, sW, sV)
+            (f, g) = (Int64(floor(diff/sV)), Int64(floor(numW/sV)))
+            (lim1, lim2) = (lim2, lim1)
+            (i, j, k, l) = (y1, x1, xF, yF)
+            (rngMin, rngMax, rngS, rngL) = ((yF, alpha1), (alphaF, yF), (alphaF, y1), (x1, xF))
+        end
+        numMin = (vMin)sMin
 
-            # Conclude Case 3 (interval case)
+        # Conclude interval case
+        if proof
             printfT("Property of Buddies",
                     "Because $numMin $vMin-shs lie in ($(rngMin[1]),$(rngMin[2])), $numMin $vMax-shs must lie in ($(rngMax[1]),$(rngMax[2]))",
                     "",
@@ -234,13 +235,15 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
             printfT("Note",
                     "Let the $vMax-shs that lie in ($(rngS[1]),$(rngS[2])) be small $vMax-shs",
                     "Let the $vMax-shs that lie in ($(rngL[1]),$(rngL[2])) be large $vMax-shs")
+        end
 
-            upperB = (vMax-f)*toFrac(rngS[2]) + (f)*toFrac(rngL[2])
-            lowerB = (vMax-g)*toFrac(rngL[1]) + (g)*toFrac(rngS[1])
-            u = formatFrac(upperB, cd)
-            l = formatFrac(lowerB, cd)
+        upperB = (vMax-f)*toFrac(rngS[2]) + (f)*toFrac(rngL[2])
+        lowerB = (vMax-g)*toFrac(rngL[1]) + (g)*toFrac(rngS[1])
+        u = formatFrac(upperB, cd)
+        l = formatFrac(lowerB, cd)
 
-            if upperB <= m//s
+        if upperB <= m//s
+            if proof
                 printfT("Case 3.1",
                         "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                         "",
@@ -251,7 +254,9 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                         "< ($(vMax-f) × $(rngS[2])) + ($f × $(rngL[2])) = $u",
                         "",
                         "Since Alice's muffin amount can not reach $size, this case is impossible")
-            elseif lowerB >= m//s
+            end
+        elseif lowerB >= m//s
+            if proof
                 printfT("Case 3.1",
                         "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
                         "",
@@ -262,7 +267,9 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                         "> ($g × $(rngS[1])) + ($(vMax-g) × $(rngL[1])) = $l",
                         "",
                         "Since Bob's muffin amount can not reach $size, this case is impossible")
-            else 
+            end
+        else
+            if proof
                 printfT("Case 3.1",
                         "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                         "",
@@ -285,12 +292,15 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                         "Since $size lies above the lower bound, this case is inconclusive")
 
                 printf("Bounding # of large and small $vMax-shs inconclusive, proceeding with individual case analysis", line=true)
-                for k=0:vMax
-                    upperB = (vMax-k)*toFrac(rngL[2]) + (k)*toFrac(rngS[2])
-                    lowerB = (vMax-k)*toFrac(rngL[1]) + (k)*toFrac(rngS[1]) 
-                    u = formatFrac(upperB, cd)
-                    l = formatFrac(lowerB, cd)
-                    if upperB <= m//s || lowerB >= m//s
+            end
+
+            for k=0:vMax
+                upperB = (vMax-k)*toFrac(rngL[2]) + (k)*toFrac(rngS[2])
+                lowerB = (vMax-k)*toFrac(rngL[1]) + (k)*toFrac(rngS[1]) 
+                u = formatFrac(upperB, cd)
+                l = formatFrac(lowerB, cd)
+                if upperB <= m//s || lowerB >= m//s
+                    if proof
                         printfT("Case 3.$(k+3)",
                                 "Alice has $k small $vMax-shs and $(vMax-k) large $vMax-shs",
                                 "Her possible muffin amount lies in:",
@@ -300,7 +310,10 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                                 "= ($l, $u)",
                                 "",
                                 "Since $size lies outside this interval, this case is impossible")
-                    else
+                    end
+                else
+                    # Fail if interval analysis inconclusive
+                    if proof
                         printfT("Case 3.$(k+3)",
                                 "Bob has $k small $vMax-shs and $(vMax-k) large $vMax-shs",
                                 "His possible muffin amount lies in:",
@@ -310,9 +323,10 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                                 "= ($l, $u)",
                                 "",
                                 "Since $size lies inside this interval, this case is inconclusive")
+                    else
                         printf("Interval analysis inconclusive, VInt failed", line=true)
-                        return false
                     end
+                    return false
                 end
             end
         end

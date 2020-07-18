@@ -10,13 +10,9 @@ LINE_WIDTH = LEFT_WIDTH + RIGHT_WIDTH
 
 # Formats and outputs a line of text
 function printf(text...; line=false)
-    if line
-        println()
-    end
+    line && println()
     println_wrapped(text..., width=LINE_WIDTH)
-    if line
-        printLine()
-    end
+    line && printLine()
 end
 
 # Formats and outputs a line of text with a theorem reference
