@@ -1,7 +1,7 @@
 # Muffins Package
 The **Muffins Package** is a Julia package for solving the **[Muffin Problem](https://www.cs.umd.edu/users/gasarch/MUFFINS/muffins.html)**:
-> *Given* **m** *muffins and* **s** *students, divide the muffins in such a way that all students receive equal portions.  
-> Determine* **α** *, the largest possible minimum muffin piece cut*
+> *Given* __m__ *muffins and* __s__ *students, divide the muffins in such a way that all students receive equal portions.  
+> Determine* __α__*, the largest possible minimum muffin piece cut*
 
 The Muffin Problem was first proposed by Alan Frank in 2011. Algorithms and solution methods were later extensively developed in *The Muffin Book* (2019), a collaboration between William Gasarch, Erik Metz, Jacob Prinz, and Daniel Smolyak among others.
 
@@ -56,7 +56,7 @@ A symbol (* or ^) is placed next to methods which have an optional `output` argu
 + Set `output` to `1` for result display without proofs
 + Set `output` to `2` for detailed proofs and result display  
 
-For example, `Muffins.solve(m, s, output=1)` will display only results of each method without proofs.  
+For example, `Muffins.half(m, s, output=1)` will display the results of the Half Method without a proof.  
 By default, `output` is set to `1` for `Muffins.solve(m, s)` and `2` for other asterisk methods.
 
 #### For methods with a carat (^):
