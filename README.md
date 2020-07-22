@@ -34,11 +34,11 @@ Run `Muffins.fc(m, s)`^ to apply the Floor-Ceiling Theorem on (`m`, `s`) to find
 
 #### Half Method
 Run `Muffins.half(m, s)`* to apply the Half Method on (`m`, `s`) to find an upper bound for α.  
-Optionally run `Muffins.vhalf(m, s, alpha)`* to verify whether the Half Method can be applied to prove that `alpha` is an upper bound for α.
+Optionally run `Muffins.vhalf(m, s, alpha)`* to verify whether the Half Method can prove that `alpha` is an upper bound for α.
 
 #### Interval Method
-Run `Muffins.int(m, s)`* to apply the Interval Method on (`m`, `s`) to find an upper bound for α.
-Optionally run `Muffins.vint(m, s, alpha)`* to verify whether the Interval Method can be applied to prove that `alpha` is an upper bound for α.
+Run `Muffins.int(m, s)`* to apply the Interval Method on (`m`, `s`) to find an upper bound for α.  
+Optionally run `Muffins.vint(m, s, alpha)`* to verify whether the Interval Method can prove that `alpha` is an upper bound for α.
 
 <!--- More method documentation to come -->
 
