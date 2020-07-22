@@ -9,17 +9,21 @@ using .Format
 export half, vhalf
 
 # Determines upper bound with Half Method, optionally outputs proof
-function half(m::Int64, s::Int64; proof::Bool=true)
-    printHeader(center("HALF METHOD"))
+function half(m::Int64, s::Int64; output::Int64=2)
+    output > 0 && printHeader(center("HALF METHOD"))
 
     if m < s
-        printf("Half Method does not apply", line=true)
-        printEnd()
+        if output > 0
+            printf("Half Method does not apply", line=true)
+            printEnd()
+        end
         return Nothing
     elseif m % s == 0
-        printfT("Half Method",
-                "Since $m % $s = 0, muffins($m,$s) = 1")
-        printEnd()
+        if output > 0
+            printfT("Half Method",
+                    "Since $m % $s = 0, muffins($m,$s) = 1")
+            printEnd()
+        end
         return 1
     end
 
@@ -31,34 +35,34 @@ function half(m::Int64, s::Int64; proof::Bool=true)
     if numW > numV
         alpha = 1 - (m//s-1//2)//(V-2)          # Value for alpha derived by solving y = 1/2
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vhalf(m, s, alpha, proof=proof)
+        if vhalf(m, s, alpha, output=output)
             return alpha
         end
     elseif numW < numV
         alpha = (m//s-1//2)//(V-1)              # Value for alpha derived by solving x = 1/2
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vhalf(m, s, alpha, proof=proof)
+        if vhalf(m, s, alpha, output=output)
             return alpha
         end
     end
 
-    printf("Half Method inconclusive", line=true)
-    printEnd()
+    if output > 0
+        printf("Half Method inconclusive", line=true)
+        printEnd()
+    end
     1
 end
 
 # Helper function for half -- verifies whether half(m, s, alpha) is conclusive
-function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
+function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     if m < s || m % s == 0
-        printf("VHalf does not apply", line=true)
+        output > 0 && printf("VHalf does not apply", line=true)
         false
     elseif alpha < 1/3
-        printfT("Theorem 4.5", 
-                "For m ≥ s, α must be ≥ 1/3")
+        output > 0 && printfT("Theorem 4.5", "For m ≥ s, α must be ≥ 1/3")
         false
     elseif alpha > 1
-        printfT("",
-                "α must be ≤ 1")
+        printfT("No piece size > 1", "α must be ≤ 1")
         false
     else
         (V, W, sV, sW) = sv(m, s)
@@ -66,7 +70,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
         numW = (W)sW
 
         # Initialize Half Method proof
-        if proof
+        if output > 1
             # Define and format variables for proof
             alphaF = formatFrac(alpha)
             size = formatFrac(m//s)
@@ -115,7 +119,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
 
         # Check if V-Conjecture applies
         if m//s * 1//(V+1) > alpha || 1 - m//s * 1//(V-2) > alpha
-            printf("V-Conjecture does not apply, VHalf failed", line=true)
+            output == 1 && printf("V-Conjecture does not apply, VHalf failed", line=true)
             return false
         end
 
@@ -123,7 +127,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
 
         # Check if FindEnd works
         if x == alpha && y == 1-alpha
-            printf("FindEnd inconclusive, VHalf failed", line=true)
+            output == 1 && printf("FindEnd inconclusive, VHalf failed", line=true)
             return false
         end
 
@@ -138,7 +142,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
         yF = formatFrac(y, cd)
 
         # Continue proof
-        if proof
+        if output > 1
             # Continue casework
             printfT("Note",
                     "The remaining cases deal with everyone having either $W or $V shs, so:",
@@ -211,21 +215,21 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
         # Conclude interval case
         half = formatFrac(1//2, cd)
         if x <= 1/2 && numV > m
-            if proof
+            if output > 1
                 printfT("Case 5",
                         "This case is impossible because there are more than $m shares ≤ $half, which violates the Property of Buddies")
             end
         elseif y >= 1/2 && numW > m
-            if proof
+            if output > 1
                 printfT("Case 5",
                         "This case is impossible because there are more than $m shares ≥ $half, which violates the Property of Buddies")
             end
         else
             # Fail if intervals inconclusive
-            if proof
+            if output > 1
                 printfT("Case 5",
                         "The Half Method is inconclusive on these intervals, VHalf failed")
-            else
+            elseif output > 0
                 printf("Could not generate conclusive intervals, VHalf failed", line=true)
             end
             return false
@@ -233,7 +237,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
 
         # Conclude proof
         alpha = formatFrac(alpha)
-        if proof
+        if output > 1
             # Conclude with alpha's value
             printHeader("CONCLUSION")
             printfT("Compute α",
@@ -245,11 +249,12 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
                     "muffins($m,$s) ≤ α, ∀ α ≥ $alpha",
                     "",
                     "muffins($m,$s) ≤ $alpha")
-        else
+            printEnd()
+        elseif output > 0
             printfT("Half Method",
                     "Upper bound of muffins($m,$s) is $alpha")
+            printEnd()
         end
-        printEnd()
 
         true
     end

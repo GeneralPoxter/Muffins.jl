@@ -9,17 +9,21 @@ using .Format
 export int, vint
 
 # Determines upper bound with Interval Method, optinally outputs proof
-function int(m::Int64, s::Int64; proof::Bool=true)
-    printHeader(center("INTERVAL METHOD"))
+function int(m::Int64, s::Int64; output::Int64=2)
+    output > 0 && printHeader(center("INTERVAL METHOD"))
     
     if m < s
-        printf("Interval Method does not apply", line=true)
-        printEnd()
+        if output > 0
+            printf("Interval Method does not apply", line=true)
+            printEnd()
+        end
         return Nothing
     elseif m % s == 0
-        printfT("Interval Method",
-                "Since $m % $s = 0, muffins($m,$s) = 1")
-        printEnd()
+        if output > 0
+            printfT("Interval Method",
+                    "Since $m % $s = 0, muffins($m,$s) = 1")
+            printEnd()
+        end
         return 1
     end
 
@@ -34,7 +38,7 @@ function int(m::Int64, s::Int64; proof::Bool=true)
         alpha = min(((W-f)W - (W-f+1)m//s + f)//((W-f-1)W + 2f),    # Value for alpha derived by solving f(1-α) + (W-f)(1-y) = m/s
                     ((g-1)W + (W -2g+1)m//s)//(W^2 - g))            # Value for alpha derived by solving gy + (W-g)(1-x) = m/s
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vint(m, s, alpha, proof=proof)
+        if vint(m, s, alpha, output=output)
             return alpha
         end
     elseif numW < numV
@@ -43,28 +47,28 @@ function int(m::Int64, s::Int64; proof::Bool=true)
         alpha = min(((V-f)W + (2f -V-1)m//s)//((V-f)W + (f-1)V),    # Value for alpha derived by solving f(1-x) + (V-f)(1-y) = m/s
                     ((V-g+1)m//s + g - V)//((V-g-1)V + 2g))         # Value for alpha derived by solving gα + (V-g)(1-x) = m/s
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vint(m, s, alpha, proof=proof)
+        if vint(m, s, alpha, output=output)
             return alpha
         end
     end
 
-    printf("Interval Method inconclusive", line=true)
-    printEnd()
+    if output > 0
+        printf("Interval Method inconclusive", line=true)
+        printEnd()
+    end
     1
 end
 
 # Helper function for int -- verifies whether int(m, s, alpha) is conclusive
-function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
+function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     if m < s || m % s == 0
-        printf("VInt does not apply", line=true)
+        output > 0 && printf("VInt does not apply", line=true)
         false
     elseif alpha < 1/3
-        printfT("Theorem 4.5", 
-                "For m ≥ s, α must be ≥ 1/3")
+        output > 0 && printfT("Theorem 4.5", "For m ≥ s, α must be ≥ 1/3")
         false
     elseif alpha > 1
-        printfT("",
-                "α must be ≤ 1")
+        output > 0 && printfT("No piece size > 1", "α must be ≤ 1")
         false
     else
         (V, W, sV, sW) = sv(m, s)
@@ -72,7 +76,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
         numW = (W)sW
         
         # Initialize Interval Method proof
-        if proof
+        if output > 1
             # Define and format variables for proof
             alphaF = formatFrac(alpha)
             size = formatFrac(m//s)
@@ -95,7 +99,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
 
         # Check if V-Conjecture applies
         if m//s * 1//(V+1) > alpha || 1 - m//s * 1//(W-1) > alpha
-            printf("V-Conjecture does not apply, VInt failed", line=true)
+            output == 1 && printf("V-Conjecture does not apply, VInt failed", line=true)
             return false
         end
 
@@ -103,7 +107,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
 
         # Check if FindEnd works
         if x == alpha && y == 1-alpha
-            printf("FindEnd inconclusive, VInt failed", line=true)
+            output == 1 && printf("FindEnd inconclusive, VInt failed", line=true)
             return false
         end
 
@@ -121,7 +125,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
         diff = abs(numV-numW)
 
         # Continue proof
-        if proof
+        if output > 1
             # Describe casework
             printHeader("CASEWORK")
 
@@ -195,7 +199,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
 
         # Fail if interval inconclusive
         if x > y || x == alpha || y == 1-alpha
-            !proof && printf("Could not generate conclusive interval, VInt failed", line=true)
+            output == 1 && printf("Could not generate conclusive interval, VInt failed", line=true)
             return false
         end
 
@@ -215,7 +219,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
         numMin = (vMin)sMin
 
         # Conclude interval case
-        if proof
+        if output > 1
             printfT("Property of Buddies",
                     "Because $numMin $vMin-shs lie in ($(rngMin[1]),$(rngMin[2])), $numMin $vMax-shs must lie in ($(rngMax[1]),$(rngMax[2]))",
                     "",
@@ -243,7 +247,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
         l = formatFrac(lowerB, cd)
 
         if upperB <= m//s
-            if proof
+            if output > 1
                 printfT("Case 3.1",
                         "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                         "",
@@ -256,7 +260,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
                         "Since Alice's muffin amount can not reach $size, this case is impossible")
             end
         elseif lowerB >= m//s
-            if proof
+            if output > 1
                 printfT("Case 3.1",
                         "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
                         "",
@@ -269,7 +273,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
                         "Since Bob's muffin amount can not reach $size, this case is impossible")
             end
         else
-            if proof
+            if output > 1
                 printfT("Bound # of large $vMax-shs",
                         "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                         "",
@@ -301,7 +305,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
                 u = formatFrac(upperB, cd)
                 l = formatFrac(lowerB, cd)
                 if upperB <= m//s || lowerB >= m//s
-                    if proof
+                    if output > 1
                         printfT("Case 3.$(k+1)",
                                 "Alice has $k small $vMax-shs and $(vMax-k) large $vMax-shs",
                                 "Her possible muffin amount lies in:",
@@ -314,7 +318,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
                     end
                 else
                     # Fail if interval analysis inconclusive
-                    if proof
+                    if output > 1
                         printfT("Case 3.$(k+3)",
                                 "Bob has $k small $vMax-shs and $(vMax-k) large $vMax-shs",
                                 "His possible muffin amount lies in:",
@@ -334,7 +338,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
 
         # Conclude proof
         alpha = formatFrac(alpha)
-        if proof
+        if output > 1
             # Conclude with alpha's value
             printHeader("CONCLUSION")
             printfT("Compute α",
@@ -346,11 +350,12 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
                     "muffins($m,$s) ≤ α, ∀ α ≥ $alpha",
                     "",
                     "muffins($m,$s) ≤ $alpha")
-        else
+            printEnd()
+        elseif output > 0
             printfT("Interval Method",
                     "Upper bound of muffins($m,$s) is $alpha")
+            printEnd()
         end
-        printEnd()
 
         true
     end

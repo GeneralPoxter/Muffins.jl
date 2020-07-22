@@ -9,7 +9,7 @@ The theorems and conjectures referenced by the **Muffins Package** are expanded 
 
 ## Requisites
 The **Muffins Package** is built and tested for Julia v1.4.  
-Download the appropriate version of Julia **[here](https://julialang.org/downloads/)**
+Download the appropriate version of Julia **[here](https://julialang.org/downloads/)**.
 
 ## Installation
 <!--- Installation instructions subject to change - will soon incorporate Pkg.add() -->
@@ -23,17 +23,14 @@ julia> import Muffins
 ```
 
 ## Usage
-Let `m` and `s` be pre-defined positive `Int64`-type variables. Let `alpha` be a pre-defined positive `Rational{Int64}`-type variable. All commands should be run in the Julia REPL after loading the package.
+Let `m` and `s` be pre-defined positive `Int64`-type variables. Let `alpha` be a pre-defined positive `Rational{Int64}`-type variable.
 
 ### General Solution
-Run `Muffins.muffins(m, s)` to solve the Muffin Problem for `m` muffins and `s` students. An upper bound for α is determined by testing (`m`, `s`) on all of the bounding methods in the package (see below). A lower bound for α is then derived by applying `Muffins.findproc(m, s, α)`.  
-Optionally run `Muffins.muffins(m, s, proof=false)` to prevent proof output in the solution. By default, `proof` is set to `true`.
+Run `Muffins.muffins(m, s)`* to solve the Muffin Problem for `m` muffins and `s` students. An upper bound for α is determined by testing (`m`, `s`) on all of the bounding methods in the package (see below). A lower bound for α is then derived by applying `Muffins.findproc(m, s, α)`.
 
-### Bounding Methods
-Asterisks (*) are placed next to methods which have an optional `proof` field, which can be set to `true` for proof output or `false` for simplified result display. `proof` is always set to `true` by default. (The `Muffins.muffins(m, s)` method above has a similar optional `proof` field)
-
+### Bounding methods
 #### Floor-Ceiling Theorem
-Run `Muffins.fc(m, s)` to apply the Floor-Ceiling Theorem on (`m`, `s`) to find an upper bound for α.
+Run `Muffins.fc(m, s)`^ to apply the Floor-Ceiling Theorem on (`m`, `s`) to find an upper bound for α.
 
 #### Half Method
 Run `Muffins.half(m, s)`* to apply the Half Method on (`m`, `s`) to find an upper bound for α.  
@@ -46,7 +43,25 @@ Optionally run `Muffins.vint(m, s, alpha)`* to verify whether the Interval Metho
 <!--- More method documentation to come -->
 
 ### FindProc
-Run `Muffins.findproc(m, s, alpha)` to display potential procedures for dividing `m` muffins among `s` students where `alpha` is the smallest muffin piece cut.
+Run `Muffins.findproc(m, s, alpha)`^ to display potential procedures/solutions for dividing `m` muffins among `s` students where `alpha` is the smallest muffin piece cut.
 
 ### Matrix Solve
-Run `Muffins.solve(m, s)` to apply linear algebra and matrices to solve the Muffin Problem.
+Run `Muffins.solve(m, s)` to apply linear algebra to solve the Muffin Problem. This is a work in progress in terms of speed and accuracy.
+
+### Output mode
+A symbol (* or ^) is placed next to methods which have an optional `output` argument, which can be set to an integer to determine the output mode.  
+
+#### For methods with an asterisk (*):  
++ Set `output` to `0` for no printing or result display
++ Set `output` to `1` for result display without proofs
++ Set `output` to `2` for detailed proofs and result display  
+
+For example, `Muffins.solve(m, s, output=1)` will display only results of each method without proofs.  
+By default, `output` is set to `1` for `Muffins.solve(m, s)` and `2` for other asterisk methods.
+
+#### For methods with a carat (^):
++ Set `output` to `0` for no printing and result display
++ Set `output` to `1` for result display
+
+For example, `Muffins.findproc(m, s, alpha, output=0)` will not print anything and only return a solutions array.  
+By default, `output` is set to `1` for carat methods.

@@ -12,8 +12,8 @@ B = []
 memo = Dict()
 
 # Determines procedure with minimum piece size alpha -- Work in progress
-function findproc(m::Int64, s::Int64, alpha::Rational{Int64})
-    printHeader(center("FIND PROCEDURE"))
+function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=1)
+    output > 0 && printHeader(center("FIND PROCEDURE"))
 
     # Clear globals
     global B = []
@@ -74,35 +74,42 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64})
     alpha = formatFrac(alpha)
 
     # Display solutions
-    printHeader("OVERVIEW")
-    printfT("Goal",
-            "Find procedures for dividing $m muffins among $s students where $alpha is the smallest piece size")
-    printfT("Note",
-            "Let the common denominator be $b")
+    if output > 0
+        printHeader("OVERVIEW")
+        printfT("Goal",
+                "Find procedures for dividing $m muffins among $s students where $alpha is the smallest piece size")
+        printfT("Note",
+                "Let the common denominator be $b")
 
-    printHeader("SOLUTIONS")
+        printHeader("SOLUTIONS")
+    end
 
     # Exit if no solutions
     if length(solutions) == 0
-        printf("No solutions for muffins($m, $s, $alpha", line=true)
-        printEnd()
-        return
+        if output > 0
+            printf("No solutions for muffins($m, $s, $alpha", line=true)
+            printEnd()
+        end
+        return Nothing
     end
 
     # Output each solution
-    for k=1:length(solutions)
-        x = solutions[k][1]
-        y = solutions[k][2]
+    if output > 0
+        for k=1:length(solutions)
+            x = solutions[k][1]
+            y = solutions[k][2]
 
-        divide = ["Divide $(Int64(x[i])) muffins {$(unpack(M[i]))}" for i=1:length(M) if x[i] > 0]
-        give = ["Give $(Int64(y[i])) students {$(unpack(S[i]))}" for i=1:length(S) if y[i] > 0]
+            divide = ["Divide $(Int64(x[i])) muffins {$(unpack(M[i]))}" for i=1:length(M) if x[i] > 0]
+            give = ["Give $(Int64(y[i])) students {$(unpack(S[i]))}" for i=1:length(S) if y[i] > 0]
 
-        printfT("Solution $k",
-                divide...,
-                give...)
+            printfT("Solution $k",
+                    divide...,
+                    give...)
+        end
+        printEnd()
     end
-    printEnd()
 
+    return [b, B, M, S, solutions]
 end
 
 # Helper function for findproc -- "vectorizes" arrays in set S based on B
