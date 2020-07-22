@@ -71,10 +71,12 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64})
         Nothing
     end
 
+    alpha = formatFrac(alpha)
+
     # Display solutions
     printHeader("OVERVIEW")
     printfT("Goal",
-            "Find procedures for dividing $m muffins among $s students")
+            "Find procedures for dividing $m muffins among $s students where $alpha is the smallest piece size")
     printfT("Note",
             "Let the common denominator be $b")
 
@@ -82,7 +84,7 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64})
 
     # Exit if no solutions
     if length(solutions) == 0
-        printf("No solutions for muffins($m, $s, $(formatFrac(alpha)))", line=true)
+        printf("No solutions for muffins($m, $s, $alpha", line=true)
         printEnd()
         return
     end

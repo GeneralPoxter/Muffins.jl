@@ -9,7 +9,7 @@ using .Format
 export int, vint
 
 # Determines upper bound with Interval Method, optinally outputs proof
-function int(m::Int64, s::Int64, proof::Bool=true)
+function int(m::Int64, s::Int64; proof::Bool=true)
     printHeader(center("INTERVAL METHOD"))
     
     if m < s
@@ -34,7 +34,7 @@ function int(m::Int64, s::Int64, proof::Bool=true)
         alpha = min(((W-f)W - (W-f+1)m//s + f)//((W-f-1)W + 2f),    # Value for alpha derived by solving f(1-α) + (W-f)(1-y) = m/s
                     ((g-1)W + (W -2g+1)m//s)//(W^2 - g))            # Value for alpha derived by solving gy + (W-g)(1-x) = m/s
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vint(m, s, alpha, proof)
+        if vint(m, s, alpha, proof=proof)
             return alpha
         end
     elseif numW < numV
@@ -43,7 +43,7 @@ function int(m::Int64, s::Int64, proof::Bool=true)
         alpha = min(((V-f)W + (2f -V-1)m//s)//((V-f)W + (f-1)V),    # Value for alpha derived by solving f(1-x) + (V-f)(1-y) = m/s
                     ((V-g+1)m//s + g - V)//((V-g-1)V + 2g))         # Value for alpha derived by solving gα + (V-g)(1-x) = m/s
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vint(m, s, alpha, proof)
+        if vint(m, s, alpha, proof=proof)
             return alpha
         end
     end
@@ -54,7 +54,7 @@ function int(m::Int64, s::Int64, proof::Bool=true)
 end
 
 # Helper function for int -- verifies whether int(m, s, alpha) is conclusive
-function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
+function vint(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
     if m < s || m % s == 0
         printf("VInt does not apply", line=true)
         false
@@ -270,28 +270,29 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
             end
         else
             if proof
-                printfT("Case 3.1",
+                printfT("Bound # of large $vMax-shs",
                         "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                         "",
                         "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim1")
-                printfT("Negation of Case 3.1",
+                printfT("Negation of previous bound",
                         "∃ student Alice with ≤ $f large $vMax-shs",
                         "She must also have ≥ $(vMax-f) small $vMax-shs, so her maximum amount of muffins is:",
                         "< ($(vMax-f) × $(rngS[2])) + ($f × $(rngL[2])) = $u",
                         "",
-                        "Since $size lies below the upper bound, this case is inconclusive")
-                printfT("Case 3.2",
+                        "Since $size lies below the interval, this bound is inconclusive")
+
+                printfT("Bound # of small $vMax-shs",
                         "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
                         "",
                         "This is impossible because $(g+1)×$sMax = $((g+1)sMax) ≥ $lim2")
-                printfT("Negation of Case 3.2",
+                printfT("Negation of previous bound",
                         "∃ student Bob with ≤ $g small $vMax-shs",
                         "He must also have ≥ $(vMax-g) large $vMax-shs, so his minimum amount of muffins is:",
                         "> ($g × $(rngS[1])) + ($(vMax-g) × $(rngL[1])) = $l",
                         "",
-                        "Since $size lies above the lower bound, this case is inconclusive")
+                        "Since $size lies above the interval, this bound is inconclusive")
 
-                printf("Bounding # of large and small $vMax-shs inconclusive, proceeding with individual case analysis", line=true)
+                printf("Bounding # of large and small $vMax-shs inconclusive, restarting with individual case analysis", line=true)
             end
 
             for k=0:vMax
@@ -301,7 +302,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
                 l = formatFrac(lowerB, cd)
                 if upperB <= m//s || lowerB >= m//s
                     if proof
-                        printfT("Case 3.$(k+3)",
+                        printfT("Case 3.$(k+1)",
                                 "Alice has $k small $vMax-shs and $(vMax-k) large $vMax-shs",
                                 "Her possible muffin amount lies in:",
                                 "",

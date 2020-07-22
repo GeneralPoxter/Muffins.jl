@@ -17,7 +17,7 @@ end
 
 # Formats and outputs a line of text with a theorem reference
 function printfT(theorem, text...)
-    wrapped = join(map( line->wrap(string(line), width=LEFT_WIDTH, break_on_hyphens=false), [text...] ), "\n")
+    wrapped = join(map(line->wrap(string(line), width=LEFT_WIDTH, break_on_hyphens=false), [text...]), "\n")
     lastPos = occursin("\n", wrapped) ? findlast('\n', wrapped) : 0
     println()
     print(rpad(wrapped, lastPos + LEFT_WIDTH))

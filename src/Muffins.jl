@@ -18,9 +18,9 @@ using .Matrix
 export muffins
 
 # Solves muffin problem for m muffins and s students -- Work in progress 
-function muffins(m::Int64, s::Int64, proof::Bool=true)
+function muffins(m::Int64, s::Int64; proof::Bool=true)
     # TODO -- add case where m < s
-    alpha = min(fc(m, s), half(m, s, proof), int(m, s, proof))
+    alpha = min(fc(m, s), half(m, s, proof=proof), int(m, s, proof=proof))
     findproc(m, s, alpha)
 end
 

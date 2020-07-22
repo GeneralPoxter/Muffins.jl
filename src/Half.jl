@@ -9,7 +9,7 @@ using .Format
 export half, vhalf
 
 # Determines upper bound with Half Method, optionally outputs proof
-function half(m::Int64, s::Int64, proof::Bool=true)
+function half(m::Int64, s::Int64; proof::Bool=true)
     printHeader(center("HALF METHOD"))
 
     if m < s
@@ -31,13 +31,13 @@ function half(m::Int64, s::Int64, proof::Bool=true)
     if numW > numV
         alpha = 1 - (m//s-1//2)//(V-2)          # Value for alpha derived by solving y = 1/2
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vhalf(m, s, alpha, proof)
+        if vhalf(m, s, alpha, proof=proof)
             return alpha
         end
     elseif numW < numV
         alpha = (m//s-1//2)//(V-1)              # Value for alpha derived by solving x = 1/2
         alpha = alpha < 1/3 ? 1//3 : alpha
-        if vhalf(m, s, alpha, proof)
+        if vhalf(m, s, alpha, proof=proof)
             return alpha
         end
     end
@@ -48,7 +48,7 @@ function half(m::Int64, s::Int64, proof::Bool=true)
 end
 
 # Helper function for half -- verifies whether half(m, s, alpha) is conclusive
-function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}, proof::Bool=true)
+function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; proof::Bool=true)
     if m < s || m % s == 0
         printf("VHalf does not apply", line=true)
         false
