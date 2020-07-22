@@ -7,19 +7,19 @@ The Muffin Problem was first proposed by Alan Frank in 2011. Algorithms and solu
 
 The theorems and conjectures referenced by the **Muffins Package** are expanded upon and proven in *The Muffin Book*.
 
-## Requisites
+## Requirements
 The **Muffins Package** is built and tested for Julia v1.4.  
 Download the appropriate version of Julia **[here](https://julialang.org/downloads/)**.
 
 ## Installation
 <!--- Installation instructions subject to change - will soon incorporate Pkg.add() -->
 Download the repository from Github and navigate to the package directory.  
-Run `julia` in the terminal to open the Julia REPL and load the package:
+Run `julia` in the terminal to open the Julia REPL and load the package by entering the following commands after the `julia>` prompt:
 
 ```julia
-julia> using Pkg
-julia> Pkg.activate(".")
-julia> import Muffins
+using Pkg
+Pkg.activate(".")
+import Muffins
 ```
 
 ## Usage
