@@ -1,14 +1,14 @@
-# Muffins Package
-The **Muffins Package** is a Julia package for solving the **[Muffin Problem](https://www.cs.umd.edu/users/gasarch/MUFFINS/muffins.html)**:
+# Muffins.jl
+**Muffins.jl** is a Julia package for solving the **[Muffin Problem](https://www.cs.umd.edu/users/gasarch/MUFFINS/muffins.html)**:
 > *Given* __m__ *muffins and* __s__ *students, divide the muffins in such a way that all students receive equal portions.  
 > Determine* __α__*, the largest possible minimum muffin piece cut*
 
 The Muffin Problem was first proposed by Alan Frank in 2011. Algorithms and solution methods were later extensively developed in *The Muffin Book* (2019), a collaboration between William Gasarch, Erik Metz, Jacob Prinz, and Daniel Smolyak among others.
 
-The theorems and conjectures referenced by the **Muffins Package** are expanded upon and proven in *The Muffin Book*.
+The theorems and conjectures referenced by **Muffins.jl** are expanded upon and proven in *The Muffin Book*.
 
 ## Requirements
-The **Muffins Package** is built and tested for Julia v1.4.  
+**Muffins.jl** is built and tested for Julia v1.4.  
 Download the appropriate version of Julia **[here](https://julialang.org/downloads/)**.
 
 ## Installation

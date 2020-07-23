@@ -54,15 +54,15 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=1)
         @constraint(model, sum(x) == m)
         @constraint(model, sum(y) == s)
 
-        # Solve for natural number solutions
-        for i=1:length(M)
+        # Solve for a natural number solutions
+        for i=1:min(length(M), 3)
             @objective(model, Min, x[i])
             optimize!(model)
-            append!(solutions, [[value.(x), value.(y)]])
+            append!(solutions, [[round.(value.(x)), round.(value.(y))]])
             
             @objective(model, Max, x[i])
             optimize!(model)
-            append!(solutions, [[value.(x), value.(y)]])
+            append!(solutions, [[round.(value.(x)), round.(value.(y))]])
         end
 
         solutions = unique(solutions)
