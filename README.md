@@ -21,22 +21,22 @@ using Muffins
 ```
 
 ## Usage
-Let `m` and `s` be predefined positive `Int64`-type variables. Let `α` be a predefined positive `Rational{Int64}`-type variable.
+Let `m` and `s` be positive `Int64`-type variables. Let `α` be a positive `Rational{Int64}`-type variable.
 
 ### General Solution
 Run `Muffins.muffins(m, s)`* to solve the Muffin Problem for `m` muffins and `s` students.  
-An upper bound `α` for `muffins(m, s)` is determined by testing (`m`, `s`) on all of the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **FindProc**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`.
+An upper bound `α` for `muffins(m, s)` is determined by testing `(m, s)` on all of the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **FindProc**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`.
 
 ### Bounding methods
 #### Floor-Ceiling Theorem
-Run `Muffins.fc(m, s)`^ to apply the Floor-Ceiling Theorem on (`m`, `s`) to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
+Run `Muffins.fc(m, s)`^ to apply the Floor-Ceiling Theorem on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
 
 #### Half Method
-Run `Muffins.half(m, s)`* to apply the Half Method on (`m`, `s`) to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
+Run `Muffins.half(m, s)`* to apply the Half Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
 Optionally run `Muffins.vhalf(m, s, α)`* to verify whether the Half Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
 
 #### Interval Method
-Run `Muffins.int(m, s)`* to apply the Interval Method on (`m`, `s`) to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
+Run `Muffins.int(m, s)`* to apply the Interval Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
 Optionally run `Muffins.vint(m, s, α)`* to verify whether the Interval Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
 
 <!--- More method documentation to come -->

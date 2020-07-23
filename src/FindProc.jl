@@ -35,7 +35,7 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=1)
         L = b - 2a + 1
         V = Int64(ceil(2m/s))
         T = Int64(b * m / s)
-        M = vectorize(f(L, b, 2))
+        M = vectorize(unionF(f(L, b, 2), f(L, b, 3)))
         S = vectorize(unionF(f(L, T, V), f(L, T, V-1)))
 
         # Initialize model
@@ -87,10 +87,10 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=1)
     # Exit if no solutions
     if length(solutions) == 0
         if output > 0
-            printf("No solutions for muffins($m, $s, $alpha", line=true)
+            printf("No solutions for muffins($m, $s, $alpha)", line=true)
             printEnd()
         end
-        return Nothing
+        return [b, B, M, S, Nothing]
     end
 
     # Output each solution
