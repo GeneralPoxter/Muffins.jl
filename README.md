@@ -1,11 +1,11 @@
 # Muffins.jl
-**Muffins.jl** is a Julia package for solving the **[Muffin Problem](https://www.cs.umd.edu/users/gasarch/MUFFINS/muffins.html)**:
-> *Given* __m__ *muffins and* __s__ *students, divide the muffins in such a way that all students receive equal portions.  
-> Determine* __α__*, the largest possible minimum muffin piece cut*
+**Muffins.jl** is a Julia package for solving the **Muffin Problem**:
+> *Given* __m__ *muffins and* __s__ *students, divide the muffins in such a way that all students can receive equal amounts of muffin.  
+> Determine* __muffins(m, s)__*, the largest possible minimum muffin piece cut*
 
 The Muffin Problem was first proposed by Alan Frank in 2011. Algorithms and solution methods were later extensively developed in *The Muffin Book* (2019), a collaboration between William Gasarch, Erik Metz, Jacob Prinz, and Daniel Smolyak among others.
 
-The theorems and conjectures referenced by **Muffins.jl** are expanded upon and proven in *The Muffin Book*.
+The theorems and conjectures referenced by **Muffins.jl** are expanded upon and proven on the **[Muffin Website](https://www.cs.umd.edu/users/gasarch/MUFFINS/muffins.html)** and in *The Muffin Book*.
 
 ## Requirements
 **Muffins.jl** is built and tested for Julia v1.4.  
@@ -21,33 +21,34 @@ using Muffins
 ```
 
 ## Usage
-Let `m` and `s` be pre-defined positive `Int64`-type variables. Let `alpha` be a pre-defined positive `Rational{Int64}`-type variable.
+Let `m` and `s` be predefined positive `Int64`-type variables. Let `α` be a predefined positive `Rational{Int64}`-type variable.
 
 ### General Solution
-Run `Muffins.muffins(m, s)`* to solve the Muffin Problem for `m` muffins and `s` students. An upper bound for α is determined by testing (`m`, `s`) on all of the bounding methods in the package (see below). A lower bound for α is then derived by applying `Muffins.findproc(m, s, α)`.
+Run `Muffins.muffins(m, s)`* to solve the Muffin Problem for `m` muffins and `s` students.  
+An upper bound `α` for `muffins(m, s)` is determined by testing (`m`, `s`) on all of the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **FindProc**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`.
 
 ### Bounding methods
 #### Floor-Ceiling Theorem
-Run `Muffins.fc(m, s)`^ to apply the Floor-Ceiling Theorem on (`m`, `s`) to find an upper bound for α.
+Run `Muffins.fc(m, s)`^ to apply the Floor-Ceiling Theorem on (`m`, `s`) to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
 
 #### Half Method
-Run `Muffins.half(m, s)`* to apply the Half Method on (`m`, `s`) to find an upper bound for α.  
-Optionally run `Muffins.vhalf(m, s, alpha)`* to verify whether the Half Method can prove that `alpha` is an upper bound for α.
+Run `Muffins.half(m, s)`* to apply the Half Method on (`m`, `s`) to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
+Optionally run `Muffins.vhalf(m, s, α)`* to verify whether the Half Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
 
 #### Interval Method
-Run `Muffins.int(m, s)`* to apply the Interval Method on (`m`, `s`) to find an upper bound for α.  
-Optionally run `Muffins.vint(m, s, alpha)`* to verify whether the Interval Method can prove that `alpha` is an upper bound for α.
+Run `Muffins.int(m, s)`* to apply the Interval Method on (`m`, `s`) to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
+Optionally run `Muffins.vint(m, s, α)`* to verify whether the Interval Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
 
 <!--- More method documentation to come -->
 
 ### FindProc
-Run `Muffins.findproc(m, s, alpha)`^ to display potential procedures/solutions for dividing `m` muffins among `s` students where `alpha` is the smallest muffin piece cut.
+Run `Muffins.findproc(m, s, α)`^ to display potential procedures/solutions for dividing `m` muffins among `s` students where `α` is the smallest muffin piece cut. A solutions array is returned.
 
 ### Matrix Solve
-Run `Muffins.solve(m, s)` to apply linear algebra to solve the Muffin Problem. This is a work in progress in terms of speed and accuracy.
+Run `Muffins.solve(m, s)` to apply linear algebra to find `muffins(m, s)`. The solution is returned. This is a work in progress in terms of speed and accuracy.
 
 ### Output mode
-A symbol (* or ^) is placed next to methods which have an optional `output` argument, which can be set to an integer to determine the output mode.  
+A symbol (* or ^) is placed next to methods which have an optional `output` argument, which can be set to an integer that determines how much text the method displays.
 
 #### For methods with an asterisk (*):  
 + Set `output` to `0` for no printing or result display
