@@ -39,6 +39,10 @@ Optionally run `Muffins.vhalf(m, s, α)`* to verify whether the Half Method can 
 Run `Muffins.int(m, s)`* to apply the Interval Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
 Optionally run `Muffins.vint(m, s, α)`* to verify whether the Interval Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
 
+#### Midpoint Method
+Run `Muffins.mid(m, s)`* to apply the Midpoint Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
+Optionally run `Muffins.vmid(m, s, α)`* to verify whether the Midpoint Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
+
 <!--- More method documentation to come -->
 
 ### FindProc
