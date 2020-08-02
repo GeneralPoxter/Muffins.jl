@@ -5,7 +5,7 @@ using .Format
 
 export fc
 
-# Determines upper bound with Floor-Ceiling Theorem
+# Determines upper bound alpha with Floor-Ceiling Theorem
 function fc(m::Int64, s::Int64; output::Int64=1)
     output > 0 && printHeader(center("FLOOR-CEILING THEOREM"))
     if m < s

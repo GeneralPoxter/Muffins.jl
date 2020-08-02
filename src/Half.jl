@@ -8,7 +8,7 @@ using .Format
 
 export half, vhalf
 
-# Determines upper bound with Half Method, optionally outputs proof
+# Determines upper bound alpha with Half Method, optionally outputs proof
 function half(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("HALF METHOD"))
 
@@ -119,7 +119,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         # Check if V-Conjecture applies
         if m//s * 1//(V+1) > alpha || 1 - m//s * 1//(V-2) > alpha
-            output == 1 && printf("V-Conjecture does not apply, VHalf failed", line=true)
+            output > 0 && printf("V-Conjecture does not apply, VHalf failed", line=true)
             return false
         end
 
@@ -127,7 +127,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         # Check if FindEnd works
         if x == alpha && y == 1-alpha
-            output == 1 && printf("FindEnd inconclusive, VHalf failed", line=true)
+            output > 0 && printf("FindEnd inconclusive, VHalf failed", line=true)
             return false
         end
 
@@ -147,7 +147,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             printfT("Note",
                     "The remaining cases deal with everyone having either $W or $V shs, so:",
                     "",
-                    "$(W)s_$W + $(V)s_$V = $(2m)  (total shs)",
+                    "$(W)·s_$W + $(V)·s_$V = $(2m)  (total shs)",
                     "s_$W + s_$V = $s  (total students)",
                     "where s_N = # of students with N shs",
                     "",
@@ -182,7 +182,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
             println()
             printf("The following intervals capture the negation of the previous cases:")
-            if x <= y && x > alpha && y < 1-alpha
+            if alpha < x <= y < 1-alpha
                 println("\n",
                         interval(["(", alphaF],
                                 [")[", xF],

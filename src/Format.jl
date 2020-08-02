@@ -46,9 +46,9 @@ end
 # Formats a Rational type variable into its string representation
 function formatFrac(frac::Rational{Int64}, den=denominator(frac))
     (n, d) = (numerator(frac), denominator(frac))
-    if n == 0
-        return 0
-    end
+	if n % d == 0 && den == d
+		return string(Int64(n/d))
+	end
     m = den % d == 0 ? Int64(den/d) : 1
     string(m * n, "/", m * d)
 end
@@ -59,7 +59,7 @@ function toFrac(frac::String)
         f = vcat(map(x->parse(Int64, x), split(frac, "/")), [1])
         f[1]//f[2]
     catch e
-        frac
+        Int64(frac)
     end
 end
 

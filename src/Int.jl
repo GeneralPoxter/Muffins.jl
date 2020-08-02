@@ -8,7 +8,7 @@ using .Format
 
 export int, vint
 
-# Determines upper bound with Interval Method, optinally outputs proof
+# Determines upper bound alpha with Interval Method, optionally outputs proof
 function int(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("INTERVAL METHOD"))
     
@@ -99,7 +99,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         # Check if V-Conjecture applies
         if m//s * 1//(V+1) > alpha || 1 - m//s * 1//(W-1) > alpha
-            output == 1 && printf("V-Conjecture does not apply, VInt failed", line=true)
+            output > 0 && printf("V-Conjecture does not apply, VInt failed", line=true)
             return false
         end
 
@@ -107,7 +107,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         # Check if FindEnd works
         if x == alpha && y == 1-alpha
-            output == 1 && printf("FindEnd inconclusive, VInt failed", line=true)
+            output > 0 && printf("FindEnd inconclusive, VInt failed", line=true)
             return false
         end
 
@@ -132,7 +132,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             printfT("V-Conjecture",
                     "The only cases that need to be considered deal with everyone having either $W or $V shs, so:",
                     "",
-                    "$(W)s_$W + $(V)s_$V = $(2m)  (total shs)",
+                    "$(W)·s_$W + $(V)·s_$V = $(2m)  (total shs)",
                     "s_$W + s_$V = $s  (total students)",
                     "where s_N = # of students with N shs",
                     "",
@@ -168,7 +168,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             printHeader("CASE 3: INTERVAL ANALYSIS")
             println()
             printf("The following intervals capture the negation of the previous cases:")
-            if x <= y && x > alpha && y < 1-alpha
+            if alpha < x <= y < 1-alpha
                 println("\n",
                         interval(["(", alphaF],
                                 [")[", xF],
@@ -199,7 +199,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         # Fail if interval inconclusive
         if x > y || x == alpha || y == 1-alpha
-            output == 1 && printf("Could not generate conclusive interval, VInt failed", line=true)
+            output == 1 && printf("Could not generate disjoint intervals, VInt failed", line=true)
             return false
         end
 
@@ -212,7 +212,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         if numV > numW
             (vMin, vMax, sMin, sMax) = (W, V, sW, sV)
             (f, g) = (Int64(floor(diff/sV)), Int64(floor(numW/sV)))
-            (lim1, lim2) = (lim2, lim1)
+            (lim1, lim2) = (diff, (vMin)sMin)
             (i, j, k, l) = (y1, x1, xF, yF)
             (rngMin, rngMax, rngS, rngL) = ((yF, alpha1), (alphaF, yF), (alphaF, y1), (x1, xF))
         end
@@ -249,28 +249,28 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         if upperB <= m//s
             if output > 1
                 printfT("Case 3.1",
-                        "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
-                        "",
-                        "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim1")
-                printfT("Case 3.2",
-                        "∃ student Alice with ≤ $f large $vMax-shs",
+                        "Alice has ≤ $f large $vMax-shs",
                         "She must also have ≥ $(vMax-f) small $vMax-shs, so her maximum amount of muffins is:",
                         "< ($(vMax-f) × $(rngS[2])) + ($f × $(rngL[2])) = $u",
                         "",
                         "Since Alice's muffin amount can not reach $size, this case is impossible")
+                printfT("Case 3.2",
+                        "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
+                        "",
+                        "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim1")
             end
         elseif lowerB >= m//s
             if output > 1
                 printfT("Case 3.1",
-                        "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
-                        "",
-                        "This is impossible because $(g+1)×$sMax = $((g+1)sMax) ≥ $lim2")
-                printfT("Case 3.2",
-                        "∃ student Bob with ≤ $g small $vMax-shs",
+                        "Bob has ≤ $g small $vMax-shs",
                         "He must also have ≥ $(vMax-g) large $vMax-shs, so his minimum amount of muffins is:",
                         "> ($g × $(rngS[1])) + ($(vMax-g) × $(rngL[1])) = $l",
                         "",
                         "Since Bob's muffin amount can not reach $size, this case is impossible")
+                printfT("Case 3.2",
+                        "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
+                        "",
+                        "This is impossible because $(g+1)×$sMax = $((g+1)sMax) ≥ $lim2")
             end
         else
             if output > 1
@@ -278,7 +278,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                         "",
                         "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim1")
-                printfT("Negation of previous bound",
+                printfT("Negation of prev. bound",
                         "∃ student Alice with ≤ $f large $vMax-shs",
                         "She must also have ≥ $(vMax-f) small $vMax-shs, so her maximum amount of muffins is:",
                         "< ($(vMax-f) × $(rngS[2])) + ($f × $(rngL[2])) = $u",
@@ -289,7 +289,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
                         "",
                         "This is impossible because $(g+1)×$sMax = $((g+1)sMax) ≥ $lim2")
-                printfT("Negation of previous bound",
+                printfT("Negation of prev. bound",
                         "∃ student Bob with ≤ $g small $vMax-shs",
                         "He must also have ≥ $(vMax-g) large $vMax-shs, so his minimum amount of muffins is:",
                         "> ($g × $(rngS[1])) + ($(vMax-g) × $(rngL[1])) = $l",
@@ -319,7 +319,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 else
                     # Fail if interval analysis inconclusive
                     if output > 1
-                        printfT("Case 3.$(k+3)",
+                        printfT("Case 3.$(k+1)",
                                 "Bob has $k small $vMax-shs and $(vMax-k) large $vMax-shs",
                                 "His possible muffin amount lies in:",
                                 "",
@@ -328,7 +328,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                                 "= ($l, $u)",
                                 "",
                                 "Since $size lies inside this interval, this case is inconclusive")
-                    else
+                    elseif output > 0
                         printf("Interval analysis inconclusive, VInt failed", line=true)
                     end
                     return false
