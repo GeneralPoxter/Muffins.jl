@@ -60,7 +60,7 @@ A symbol (* or ^) is placed next to methods which have an optional `output` argu
 + Set `output` to `2` for detailed proofs and result display  
 
 For example, `Muffins.half(m, s, output=1)` will display the results of the Half Method without a proof.  
-By default, `output` is set to `1` for `Muffins.solve(m, s)` and `2` for other asterisk methods.
+By default, `output` is set to `1` for `Muffins.muffins(m, s)` and `2` for other asterisk methods.
 
 #### For methods with a carat (^):
 + Set `output` to `0` for no printing and result display

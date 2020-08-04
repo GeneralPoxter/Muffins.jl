@@ -124,9 +124,11 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         end
 
         ((_, x), (y, _)) = findend(m, s, alpha, V)
+        xOriginal = m//s - alpha*(V-1)
+        yOriginal = m//s - (1-alpha)*(V-2)
 
         # Check if FindEnd works
-        if x == alpha && y == 1-alpha
+        if x != xOriginal && y != yOriginal
             output > 0 && printf("FindEnd inconclusive, VHalf failed", line=true)
             return false
         end
@@ -155,7 +157,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     "s_$W = $sW, s_$V = $sV",
                     "So there are $numW $W-shs and $numV $V-shs")
             
-            if x != alpha
+            if x == xOriginal
                 printfT("Case 3",
                         "Alice has a $V-sh ≥ $xF",
                         "Her other $(V-1) $V-shs sum to ≤ ($size - $xF) = $c",
@@ -167,7 +169,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         "FindEnd did not produce a conclusive bound for $V-shs")
             end
 
-            if y != 1-alpha
+            if y == yOriginal
                 printfT("Case 4",
                         "Bob has a $W-sh ≤ $yF",
                         "His other $(W-1) $W-shs sum to ≥ ($size - $yF) = $d",
