@@ -1,4 +1,4 @@
-module FloorCeiling
+module FC
 
 include("Format.jl")
 using .Format

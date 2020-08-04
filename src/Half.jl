@@ -59,7 +59,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         output > 0 && printf("VHalf does not apply", line=true)
         false
     elseif alpha < 1/3
-        output > 0 && printfT("Theorem 4.5", "For m ≥ s, α must be ≥ 1/3")
+        output > 0 && printfT("No piece size < 1/3", "For m ≥ s, α must be ≥ 1/3")
         false
     elseif alpha > 1
         printfT("No piece size > 1", "α must be ≤ 1")
@@ -80,19 +80,19 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             b = formatFrac(b)
 
             # Establish assumptions and premises
-            printHeader("OVERVIEW")
-            printfT("Goal", 
-                    "Prove:",
-                    "muffins($m,$s) ≤ α = $alphaF",
-                    "by contradicting the assumption")
+            printHeader("CLAIM")
+            printfT("Claim",
+                    "For all ($m, $s) procedures, the smallest piece size is bounded above by α = $alphaF",
+                    "Proven by contradicting the assumption")
+
+            printHeader("ASSUMPTION")
             printfT("Assumption", 
-                    "Assume:",
-                    "The desired upper bound is α",
-                    "muffins($m,$s) > α ≥ 1/3")
-            printfT("Theorem 2.6.2", 
-                    "Since muffins($m,$s) > 1/3, each muffin must be cut into 2 shs, totaling $(2m) shs")
+                    "Assume muffins($m,$s) > α ≥ 1/3")
             printfT("Property of Buddies",
+                    "Since muffins($m,$s) > 1/3, each muffin must be cut into 2 shs, totaling $(2m) shs",
+                    "",
                     "Since each muffin is cut into 2 shs that are buddies, the # of shs ≤ 1/2 must equal the # of shs ≥ 1/2",
+                    "",
                     "It follows that the # of shs ≤ 1/2 and the # of shs ≥ 1/2 cannot exceed $m")
 
             # Begin casework
@@ -146,7 +146,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         # Continue proof
         if output > 1
             # Continue casework
-            printfT("Note",
+            printfT("V-Conjecture",
                     "The remaining cases deal with everyone having either $W or $V shs, so:",
                     "",
                     "$(W)·s_$W + $(V)·s_$V = $(2m)  (total shs)",
@@ -245,8 +245,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             printfT("Compute α",
                     "Each possible case derives a lower bound for α that contradicts the assumption",
                     "",
-                    "All possible cases contradict the assumption iff.",
-                    "α ≥ max($a, $b, $alpha) = $alpha")
+                    "All possible cases contradict the assumption iff. α ≥ max($a, $b, $alpha) = $alpha")
             printfT("Conclusion",
                     "muffins($m,$s) ≤ α, ∀ α ≥ $alpha",
                     "",
@@ -254,7 +253,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             printEnd()
         elseif output > 0
             printfT("Half Method",
-                    "Upper bound of muffins($m,$s) is $alpha")
+                    "Upper bound α of muffins($m,$s) is $alpha")
             printEnd()
         end
 

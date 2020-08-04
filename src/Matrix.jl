@@ -3,8 +3,8 @@ module Matrix
 using JuMP
 using Cbc
 
-include("FloorCeiling.jl")
-using .FloorCeiling
+include("FC.jl")
+using .FC
 
 export solve 
 

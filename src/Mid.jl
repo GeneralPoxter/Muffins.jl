@@ -56,7 +56,7 @@ function mid(m::Int64, s::Int64; output::Int64=2)
     end
 
     if output > 0
-        printf("Midpoint Method inconclusive", line=true)
+        printf("All α candidates were inconclusive, Midpoint Method inconclusive", line=true)
         printEnd()
     end
     1
@@ -68,7 +68,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         output > 0 && printf("VMid does not apply", line=true)
         false
     elseif alpha < 1/3
-        output > 0 && printfT("Theorem 4.5", "For m ≥ s, α must be ≥ 1/3")
+        output > 0 && printfT("No piece size < 1/3", "For m ≥ s, α must be ≥ 1/3")
         false
     elseif alpha > 1
         output > 0 && printfT("No piece size > 1", "α must be ≤ 1")
@@ -85,18 +85,17 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             size = formatFrac(m//s)
 
             # Establish assumptions and premises
-            printHeader("OVERVIEW")
-            printfT("Goal", 
-                    "Prove:",
-                    "muffins($m,$s) ≤ α = $alphaF",
-                    "by contradicting the assumption")
+            printHeader("CLAIM")
+            printfT("Claim",
+                    "For all ($m, $s) procedures, the smallest piece size is bounded above by α = $alphaF",
+                    "Proven by contradicting the assumption")
+
+            printHeader("ASSUMPTION")
             printfT("Assumption", 
-                    "Assume:",
-                    "The desired upper bound is α",
-                    "muffins($m,$s) > α ≥ 1/3")
-            printfT("Theorem 2.6.2", 
-                    "Since muffins($m,$s) > 1/3, each muffin must be cut into 2 shs, totaling $(2m) shs")
+                    "Assume muffins($m,$s) > α ≥ 1/3")
             printfT("Property of Buddies",
+                    "Since muffins($m,$s) > 1/3, each muffin must be cut into 2 shs, totaling $(2m) shs",
+                    "",
                     "Since each muffin is cut into 2 shs that are buddies, each sh of size x must imply the existence of a sh of size 1-x")
         end
         
@@ -479,8 +478,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             printfT("Compute α",
                     "Each possible case derives the same lower bound for α that contradicts the assumption",
                     "",
-                    "All possible cases contradict the assumption iff.",
-                    "α ≥ $alpha")
+                    "All possible cases contradict the assumption iff. α ≥ $alpha")
             printfT("Conclusion",
                     "muffins($m,$s) ≤ α, ∀ α ≥ $alpha",
                     "",
@@ -488,7 +486,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             printEnd()
         elseif output > 0
             printfT("Midpoint Method",
-                    "Upper bound of muffins($m,$s) is $alpha")
+                    "Upper bound α of muffins($m,$s) is $alpha")
             printEnd()
         end
 

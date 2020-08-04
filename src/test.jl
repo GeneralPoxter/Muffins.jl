@@ -1,6 +1,6 @@
 # Import package and any files here ↴
-include("FloorCeiling.jl")
-using .FloorCeiling
+include("FC.jl")
+using .FC
 
 include("Half.jl")
 using .Half
@@ -10,6 +10,9 @@ using .Int
 
 include("Mid.jl")
 using .Mid
+
+include("EBM.jl")
+using .EBM
 
 # Make sure test.txt is in the same folder as test.jl
 lines = open("test.txt") do file
@@ -55,7 +58,7 @@ for case in lines
         end
 
         if startswith(method, "EBM")
-            # res = METHOD(m, s)
+            res = ebm(m, s, output=0)
         end
 
         if startswith(method, "HBM")
@@ -77,9 +80,4 @@ for case in lines
 
 end
 
-# Filter inconclusive responses; remove if needed
-for i in incorrect
-    if i[3] != 1
-        println(i)
-    end
-end
+# Customize output here ↴
