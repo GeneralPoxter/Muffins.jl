@@ -364,9 +364,10 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 end
 
                 if length(posInt) == 3
-                    x1 = formatFrac(((z1[3]-z1[2]+z2[2]-z2[3])numMin + ((z2[3]-z1[3])z3[2]+(z1[2]-z2[2])z3[3])sMax)//((z1[3]-z1[2]+z2[2]-z2[3])z3[1] + (z1[1]-z1[3]+z2[3]-z2[1])z3[2] + (z1[2]-z1[1]+z2[1]-z2[2])z3[3]))
-                    x2 = formatFrac(((z1[3]-z2[3])numMin - ((z1[3]-z2[3])z3[1] + (z2[1]-z1[1])z3[3])*toFrac(x1))//((z1[3]-z2[3])z3[2] + (z2[2]-z1[2])z3[3]))
-                    x3 = formatFrac(sMax-toFrac(x1)-toFrac(x2))
+                    x1 = ((z1[3]-z1[2]+z2[2]-z2[3])numMin + ((z2[3]-z1[3])z3[2]+(z1[2]-z2[2])z3[3])sMax)//((z1[3]-z1[2]+z2[2]-z2[3])z3[1] + (z1[1]-z1[3]+z2[3]-z2[1])z3[2] + (z1[2]-z1[1]+z2[1]-z2[2])z3[3])
+                    x2 = ((z1[3]-z2[3])numMin - ((z1[3]-z2[3])z3[1] + (z2[1]-z1[1])z3[3])*x1)//((z1[3]-z2[3])z3[2] + (z2[2]-z1[2])z3[3])
+                    x3 = sMax-x1-x2
+                    (x1F, x2F, x3F) = (formatFrac(x1), formatFrac(x2), formatFrac(x3))
 
                     equations = ["$(z1[1])·x + $(z1[2])·y + $(z1[3])·z = $(z2[1])·x + $(z2[2])·y + $(z2[3])·z",
                                 "$(z3[1])·x + $(z3[2])·y + $(z3[3])·z = |$Z3| = $numMin",
@@ -379,19 +380,20 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                                 "and z the # of students with",
                                 "$(a[3]) A-shs, $(b[3]) B-shs, and $(c[3]) C-shs"]
 
-                    if occursin("/", x1) || occursin("/", x2) || toFrac(x1) < 0 || toFrac(x2) < 0 || toFrac(x3) < 0
-                        solutions = ["The solutions are x = $x1, y = $x2, z = $x3",
+                    if occursin("/", x1F) || occursin("/", x2F) || x1 < 0 || x2 < 0 || x3 < 0
+                        solutions = ["The solutions are x = $x1F, y = $x2F, z = $x3F",
                                     "The solutions are not positive integers, so the entirety of Case 3 is impossible"]
                     else
-                        solutions = ["The solutions are x = $x1, y = $x2, z = $x3",
+                        solutions = ["The solutions are x = $x1F, y = $x2F, z = $x3F",
                                     "The solutions are positive integers, so Case 3 is still possible, VMid failed"]
                         fail = true
                     end
                 end
                 
                 if length(posInt) == 2
-                    x1 = formatFrac(sMax//(1+(z1[1]-z2[1])//(z2[2]-z1[2])))
-                    x2 = formatFrac(sMax-toFrac(x1))
+                    x1 = sMax//(1+(z1[1]-z2[1])//(z2[2]-z1[2]))
+                    x2 = sMax-x1
+                    (x1F, x2F) = (formatFrac(x1), formatFrac(x2))
 
                     equations = ["$(z1[1])·x + $(z1[2])·y = $(z2[1])·x + $(z2[2])·y",
                                 "x + y = s_$vMax = $sMax",
@@ -401,14 +403,14 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                                 "and y the # of students with",
                                 "$(a[2]) A-shs, $(b[2]) B-shs, and $(c[2]) C-shs"]
                     
-                    if occursin("/", x1) || toFrac(x1) < 0 || toFrac(x2) < 0 
-                        solutions = ["The solutions are x = $x1, y = $x2",
+                    if occursin("/", x1F) || x1 < 0 || x2 < 0 
+                        solutions = ["The solutions are x = $x1F, y = $x2F",
                                     "The solutions are not positive integers, so the entirety of Case 3 is impossible"]
-                    elseif z3[1]*toFrac(x1) + z3[2]*toFrac(x2) != numMin
+                    elseif z3[1]*x1 + z3[2]*x2 != numMin
                         insert!(equations, 3, "$(z3[1])·x + $(z3[2])·y = |$Z3| = $numMin")
                         solutions = ["This system has no solutions, so the entirety of Case 3 is impossible"]
                     else
-                        solutions = ["The solutions are x = $x1, y = $x2", 
+                        solutions = ["The solutions are x = $x1F, y = $x2F", 
                                     "The solutions are positive integers, so Case 3 is still possible, VMid failed"]
                         fail = true
                     end
