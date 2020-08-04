@@ -16,7 +16,7 @@ Run `julia` in the terminal to open the Julia REPL and load the package by enter
 
 ```julia
 using Pkg
-Pkg.add("https://github.com/GeneralPoxter/Muffins.jl")
+Pkg.add(PacakgeSpec(url="https://github.com/GeneralPoxter/Muffins.jl"))
 using Muffins
 ```
 
