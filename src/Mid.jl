@@ -345,8 +345,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 if length(posInt) > 3
                     if output > 1
                         printfT("System of equations",
-                                "A solvable system of equations could not be set up to see if the above combinations will result in a contradictory non-integer solution,",
-                                "VMid failed")
+                                "A solvable system of equations could not be set up to see if the above combinations will result in a contradictory non-integer solution, VMid failed")
                     elseif output > 0
                         printf("Could not generate conclusive system of equations, VMid failed", line=true)
                     end
@@ -382,7 +381,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
                     if occursin("/", x1F) || occursin("/", x2F) || x1 < 0 || x2 < 0 || x3 < 0
                         solutions = ["The solutions are x = $x1F, y = $x2F, z = $x3F",
-                                    "The solutions are not positive integers, so the entirety of Case 3 is impossible"]
+                                    "The solutions are not positive integers, so Case 3 is impossible"]
                     else
                         solutions = ["The solutions are x = $x1F, y = $x2F, z = $x3F",
                                     "The solutions are positive integers, so Case 3 is still possible, VMid failed"]
@@ -405,10 +404,10 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     
                     if occursin("/", x1F) || x1 < 0 || x2 < 0 
                         solutions = ["The solutions are x = $x1F, y = $x2F",
-                                    "The solutions are not positive integers, so the entirety of Case 3 is impossible"]
+                                    "The solutions are not positive integers, so Case 3 is impossible"]
                     elseif z3[1]*x1 + z3[2]*x2 != numMin
                         insert!(equations, 3, "$(z3[1])·x + $(z3[2])·y = |$Z3| = $numMin")
-                        solutions = ["This system has no solutions, so the entirety of Case 3 is impossible"]
+                        solutions = ["This system has no solutions, so Case 3 is impossible"]
                     else
                         solutions = ["The solutions are x = $x1F, y = $x2F", 
                                     "The solutions are positive integers, so Case 3 is still possible, VMid failed"]
@@ -423,10 +422,23 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                                 "where x is the # of students with $(a[1]) A-shs, $(b[1]) B-shs, and $(c[1]) C-shs"]
                     
                     if z1[1] != z2[1]
-                        solutions = ["This system has no solution, so the entirety of Case 3 is impossible"]
+                        solutions = ["This system has no solution, so Case 3 is impossible"]
                     else
-                        solutions = ["This system has infinite solutions, VMid failed"]
-                        fail = true
+                        x1 = numMin//z3[1]
+                        x1F = formatFrac(x1)
+                        insert!(equations, 3, "$(z3[1])·x = |$Z3| = $numMin")
+                        if occursin("/", x1F)
+                            solutions = ["The solution is x = $x1F",
+                                        "The solution is not a positive integer, so Case 3 is impossible"]
+                        else
+                            if x1 != sMax
+                                solutions = ["This system has no solution, so Case 3 is impossible"]
+                            else
+                                solutions = ["The solution is x = $x1F",
+                                            "The solution is a positive integer, so Case 3 is still possible, VMid failed "]
+                                fail = true
+                            end
+                        end
                     end
                 end
 
