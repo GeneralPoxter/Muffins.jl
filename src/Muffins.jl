@@ -23,10 +23,10 @@ using .FindProc
 
 export muffins
 
-# Solves muffin problem for m muffins and s students -- Work in progress 
+# Solves muffin problem for m muffins and s students -- Work in progress
 function muffins(m::Int64, s::Int64; output::Int64=1)
     # TODO -- add case where m < s
-    alphas = [  fc(m, s, output=0), 
+    alphas = [  fc(m, s, output=0),
                 half(m, s, output=0),
                 int(m, s, output=0),
                 mid(m, s, output=0),

@@ -46,6 +46,7 @@ function ebm(m::Int64, s::Int64; output::Int64=2)
 
         k = i-1
         a = s-(3*d*k)
+        comden = 3*d*k+a
 
         if 2*d+1 <= a <= 3*d
             alpha = (d*k+a//3)//(comden)
@@ -104,11 +105,11 @@ end
 
 k = i-1
 a = s-(3*d*k)
+comden = 3*d*k+a
 
 
 if V==3 #ebm only works if there are 2-shares
 
-comden = 3*d*k+a
 firstparameter = formatFrac(a//3)
 case1 = (3*d*k+a+d)//(comden)
 case1str = formatFrac(case1)
