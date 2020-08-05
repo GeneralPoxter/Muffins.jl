@@ -6,6 +6,7 @@ using .Format
 export fc
 
 # Determines upper bound alpha with Floor-Ceiling Theorem
+# Authors: Antara Hebbar and Jason Liu
 function fc(m::Int64, s::Int64; output::Int64=1)
     output > 0 && printHeader(center("FLOOR-CEILING THEOREM"))
     if m < s

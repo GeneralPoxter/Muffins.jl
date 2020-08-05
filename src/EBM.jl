@@ -32,8 +32,6 @@ function ebm(m::Int64, s::Int64; output::Int64=2)
     end
 
     (V, W, sV, sW) = sv(m, s)
-    numV = (V)sV
-    numW = (W)sW
 
     alpha = 1
     if V == 3

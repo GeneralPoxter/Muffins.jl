@@ -9,6 +9,7 @@ using .Format
 export half, vhalf
 
 # Determines upper bound alpha with Half Method, optionally outputs proof
+# Authors: Antara Hebbar and Jason Liu
 function half(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("HALF METHOD"))
 

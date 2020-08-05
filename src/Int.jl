@@ -9,6 +9,7 @@ using .Format
 export int, vint
 
 # Determines upper bound alpha with Interval Method, optionally outputs proof
+# Authors: Antara Hebbar and Jason Liu
 function int(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("INTERVAL METHOD"))
     

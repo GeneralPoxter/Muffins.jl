@@ -9,6 +9,7 @@ using .Format
 export mid, vmid
 
 # Determines upper bound alpha with Midpoint Method, optionally outputs proof
+# Author: Jason Liu
 function mid(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("MIDPOINT METHOD"))
 

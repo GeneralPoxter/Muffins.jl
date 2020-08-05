@@ -12,6 +12,7 @@ B = []
 memo = Dict()
 
 # Determines procedure with minimum piece size alpha -- Work in progress
+# Author: Jason Liu
 function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     output > 0 && printHeader(center("FIND PROCEDURE"))
 

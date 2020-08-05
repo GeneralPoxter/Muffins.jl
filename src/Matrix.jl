@@ -9,6 +9,7 @@ using .FC
 export solve 
 
 # Matrix method solver -- uses CBC MIP optimizer
+# Author: Jason Liu
 function solve(m, s)
     model = Model(Cbc.Optimizer)
     set_optimizer_attribute(model, "allowableGap", 1e-5)
