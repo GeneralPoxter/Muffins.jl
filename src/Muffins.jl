@@ -53,8 +53,8 @@ function muffins(m::Int64, s::Int64; output::Int64=1)
     end
     disp && println("\nOptimal α derived by $method ⮥")
 
-    solutions = findproc(m, s, alpha, output=0)
-    if solutions[5] == Nothing
+    procedures = findproc(m, s, alpha, output=0)[5]
+    if procedures == Nothing
         disp && println("\nFindProc could not confirm optimal α to be a lower bound\nmuffins($m,$s) failed")
         return 1
     end

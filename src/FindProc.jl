@@ -105,15 +105,15 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         give...)
             else
                 printfT("Procedure",
-                        divide[1],
-                        give[1])
+                        divide...,
+                        give...)
                 break
             end
         end
         printEnd()
     end
 
-    return [b, B, M, S, procedures]
+    [b, B, M, S, procedures]
 end
 
 # Helper function for findproc -- "vectorizes" arrays in set S based on B
