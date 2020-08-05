@@ -15,8 +15,8 @@ using .Mid
 include("EBM.jl")
 using .EBM
 
-include("FindProc.jl")
-using .FindProc
+#include("FindProc.jl")
+#using .FindProc
 
 #include("Matrix.jl")
 #using .Matrix

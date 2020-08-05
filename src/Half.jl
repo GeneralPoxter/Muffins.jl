@@ -83,7 +83,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             # Establish assumptions and premises
             printHeader("CLAIM")
             printfT("Claim",
-                    "For all ($m, $s) procedures, the smallest piece size is bounded above by α = $alphaF",
+                    "For all ($m, $s) procedures where $s students each receive $size muffins, the smallest piece size is bounded above by α = $alphaF",
                     "Proven by contradicting the assumption")
 
             printHeader("ASSUMPTION")
@@ -147,7 +147,7 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         # Continue proof
         if output > 1
             # Continue casework
-            printfT("V-Conjecture",
+            printfT("Note",
                     "The remaining cases deal with everyone having either $W or $V shs, so:",
                     "",
                     "$(W)·s_$W + $(V)·s_$V = $(2m)  (total shs)",
@@ -243,11 +243,8 @@ function vhalf(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         if output > 1
             # Conclude with alpha's value
             printHeader("CONCLUSION")
-            printfT("Compute α",
-                    "Each possible case derives a lower bound for α that contradicts the assumption",
-                    "",
-                    "All possible cases contradict the assumption iff. α ≥ max($a, $b, $alpha) = $alpha")
             printfT("Conclusion",
+                    "All possible cases contradict the assumption iff. α ≥ $alpha",
                     "muffins($m,$s) ≤ α, ∀ α ≥ $alpha",
                     "",
                     "muffins($m,$s) ≤ $alpha")

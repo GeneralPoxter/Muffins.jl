@@ -84,11 +84,15 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             # Define and format variables for proof
             alphaF = formatFrac(alpha)
             size = formatFrac(m//s)
+            a = formatFrac(m//(V+1)s)
+            b = max(1-m//(W-1)s, 0)
+            b1 = formatFrac(1-b)
+            b = formatFrac(b)
 
             # Establish assumptions and premises
             printHeader("CLAIM")
             printfT("Claim",
-                    "For all ($m, $s) procedures, the smallest piece size is bounded above by α = $alphaF",
+                    "For all ($m, $s) procedures where $s students each receive $size muffins, the smallest piece size is bounded above by α = $alphaF",
                     "Proven by contradicting the assumption")
 
             printHeader("ASSUMPTION")
@@ -98,6 +102,27 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     "Since muffins($m,$s) > 1/3, each muffin must be cut into 2 shs, totaling $(2m) shs",
                     "",
                     "Since each muffin is cut into 2 shs that are buddies, each sh of size x must imply the existence of a sh of size 1-x")
+
+            # Begin casework
+            printHeader("CASEWORK")
+
+            printfT("Case 1",
+            "Alice has ≥ $(V+1) shs",
+            "One of them is ≤ ($size × 1/$(V+1)) = $a",
+            "",
+            "Contradicts assumption if α ≥ $a")
+
+            if W-1 <= 1 && m/s > 1
+                printfT("Case 2",
+                        "Bob cannot have ≤ $(W-1) shs since $size > 1, so this case is impossible")
+            else
+                printfT("Case 2",
+                        "Bob has ≤ $(W-1) shs",
+                        "One of them is ≥ ($size × 1/$(W-1)) = $b1",
+                        "Its buddy is ≤ (1 - $b1) = $b",
+                        "",
+                        "Contradicts assumption if α ≥ $b")
+            end
         end
         
         # Check if V-Conjecture applies
@@ -120,7 +145,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         cd = lcm(s, denominator(x), denominator(y))
         alphaF = formatFrac(alpha, cd)
         alpha1 = formatFrac(1-alpha, cd)
-        size = formatFrac(m//s, cd)
+        size = formatFrac(m//s)
         a = formatFrac(m//s-x, cd)
         b = formatFrac(m//s-y, cd)
         xF = formatFrac(x, cd)
@@ -131,10 +156,8 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         # Continue proof
         if output > 1
-            # Describe casework
-            printHeader("CASEWORK")
-
-            printfT("V-Conjecture",
+            # Continue casework
+            printfT("Note",
                     "The only cases that need to be considered deal with everyone having either $W or $V shs, so:",
                     "",
                     "$(W)·s_$W + $(V)·s_$V = $(2m)  (total shs)",
@@ -146,19 +169,19 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     "So there are $numW $W-shs and $numV $V-shs")
 
             if x == xOriginal
-                printfT("Case 1",
+                printfT("Case 3",
                         "Alice has a $V-sh ≥ $xF",
                         "Her other $(V-1) $V-shs sum to ≤ ($size - $xF) = $a",
                         "One of them is ≤ ($a × 1/$(V-1)) = $alphaF",
                         "",
                         "Contradicts assumption if α ≥ $alphaF")
             else
-                printfT("Case 1",
+                printfT("Case 3",
                         "FindEnd did not produce a conclusive bound for $V-shs")
             end
 
             if y == yOriginal
-                printfT("Case 2",
+                printfT("Case 4",
                         "Bob has a $W-sh ≤ $yF",
                         "His other $(W-1) $W-shs sum to ≥ ($size - $yF) = $b",
                         "One of them is ≥ ($b × 1/$(W-1)) = $alpha1",
@@ -166,11 +189,11 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         "",
                         "Contradicts assumption if α ≥ $alphaF")
             else
-                printfT("Case 2",
+                printfT("Case 4",
                         "FindEnd did not produce a conclusive bound for $W-shs")
             end
 
-            printHeader("CASE 3: INTERVAL ANALYSIS")
+            printHeader("CASE 5: INTERVAL ANALYSIS")
             println()
             printf("The following intervals capture the negation of the previous cases:")
             if alpha < x <= y < 1-alpha
@@ -188,16 +211,23 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                                     [")[", xF],
                                     [")", alpha1],
                                     labels=["$numV $V-shs", "0 $V-shs"]))
+                else
+                    println("\n",
+                            "No negation interval for $V-shs")
                 end
+
                 if yF != alpha1
                     println("\n",
                             interval(["(", alphaF],
                                     ["](", yF],
                                     [")", alpha1],
                                     labels=["0 $W-shs", "$numW $W-shs"]))
+                else
+                    println("\n",
+                            "No negation interval for $W-shs")
                 end
 
-                printfT("Case 3",
+                printfT("Case 5",
                         "The Midpoint Method is inconclusive on these intervals, VMid failed")
             end
         end
@@ -222,9 +252,9 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         # Conclude interval case with case by case analysis
         if output > 1
             printfT("Property of Buddies",
-                    "Because $numMin $vMin-shs lie in ($(rngMin[1]),$(rngMin[2])), $numMin $vMax-shs must lie in ($(rngMax[1]),$(rngMax[2]))",
+                    "Because 0 shs lie in [$xF,$yF], 0 shs must also lie in [$y1,$x1]",
                     "",
-                    "Similary, the gap that lies in [$xF,$yF] implies a gap that lies in [$y1,$x1]")
+                    "Similary, the $numMin $vMin-shs in ($(rngMin[1]),$(rngMin[2])) implies $numMin $vMax-shs in ($(rngMax[1]),$(rngMax[2]))")
             println()
             printf("The following intervals capture the previous statements:")
             println("\n",
@@ -257,14 +287,14 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             mid = formatFrac(1//2, cd)
             if output > 1
                 combos = ["$k small $vMax-shs and $(vMax-k) large $vMax-shs" for k in posCombo]
-                printfT("Case 3",
+                printfT("Case 5",
                         "All combinations of small and large $vMax-shs are impossible except for:",
                         "",
                         combos...,
                         "",
                         "because the range of muffin amounts for the others does not include $size")
 
-                printHeader("CASE 3: MIDPOINT ANALYSIS")
+                printHeader("CASE 5: MIDPOINT ANALYSIS")
                 printfT("Property of Buddies",
                         "The # of $vMax-shs in ($j, $mid) is equal to the # of $vMax-shs in ($mid, $k)")
             end
@@ -280,12 +310,12 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                             [")[", k],
                             ["](", l],
                             [")", alpha1],
-                            labels=["z $W-shs", "z $W-shs", "0", "$numV $W-shs"]))
+                            labels=["h $W-shs", "h $W-shs", "0", "$numV $W-shs"]))
                     printLine()
                     printfT("Note",
                             "We define the following intervals:",
                             "A = ($j,$mid)",
-                            "B = ($mid,$k) (|A| = |B| = z)",
+                            "B = ($mid,$k) (|A| = |B| = h)",
                             "C = ($l,$alpha1) (|C| = $numV)")
                 end
 
@@ -308,13 +338,13 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                             ["](", j],
                             ["|", mid],
                             [")", k],
-                            labels=["$numW $V-shs", "0", "z $V-shs", "z $V-shs"]))
+                            labels=["$numW $V-shs", "0", "h $V-shs", "h $V-shs"]))
                     printLine()
                     printfT("Note",
                             "We define the following intervals:",
                             "A = ($alphaF,$i) (|A| = $numW)",
                             "B = ($j,$mid)",
-                            "C = ($mid,$k) (|B| = |C| = z)")
+                            "C = ($mid,$k) (|B| = |C| = h)")
                 end
 
                 # Determine possible interval combinations
@@ -381,10 +411,10 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
                     if occursin("/", x1F) || occursin("/", x2F) || x1 < 0 || x2 < 0 || x3 < 0
                         solutions = ["The solutions are x = $x1F, y = $x2F, z = $x3F",
-                                    "The solutions are not positive integers, so Case 3 is impossible"]
+                                    "The solutions are not positive integers, so Case 5 is impossible"]
                     else
                         solutions = ["The solutions are x = $x1F, y = $x2F, z = $x3F",
-                                    "The solutions are positive integers, so Case 3 is still possible, VMid failed"]
+                                    "The solutions are positive integers, so Case 5 is still possible, VMid failed"]
                         fail = true
                     end
                 end
@@ -404,13 +434,13 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     
                     if occursin("/", x1F) || x1 < 0 || x2 < 0 
                         solutions = ["The solutions are x = $x1F, y = $x2F",
-                                    "The solutions are not positive integers, so Case 3 is impossible"]
+                                    "The solutions are not positive integers, so Case 5 is impossible"]
                     elseif z3[1]*x1 + z3[2]*x2 != numMin
                         insert!(equations, 3, "$(z3[1])·x + $(z3[2])·y = |$Z3| = $numMin")
-                        solutions = ["This system has no solutions, so Case 3 is impossible"]
+                        solutions = ["This system has no solutions, so Case 5 is impossible"]
                     else
                         solutions = ["The solutions are x = $x1F, y = $x2F", 
-                                    "The solutions are positive integers, so Case 3 is still possible, VMid failed"]
+                                    "The solutions are positive integers, so Case 5 is still possible, VMid failed"]
                         fail = true
                     end
                 end
@@ -422,20 +452,20 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                                 "where x is the # of students with $(a[1]) A-shs, $(b[1]) B-shs, and $(c[1]) C-shs"]
                     
                     if z1[1] != z2[1]
-                        solutions = ["This system has no solution, so Case 3 is impossible"]
+                        solutions = ["This system has no solution, so Case 5 is impossible"]
                     else
                         x1 = numMin//z3[1]
                         x1F = formatFrac(x1)
                         insert!(equations, 3, "$(z3[1])·x = |$Z3| = $numMin")
                         if occursin("/", x1F)
                             solutions = ["The solution is x = $x1F",
-                                        "The solution is not a positive integer, so Case 3 is impossible"]
+                                        "The solution is not a positive integer, so Case 5 is impossible"]
                         else
                             if x1 != sMax
-                                solutions = ["This system has no solution, so Case 3 is impossible"]
+                                solutions = ["This system has no solution, so Case 5 is impossible"]
                             else
                                 solutions = ["The solution is x = $x1F",
-                                            "The solution is a positive integer, so Case 3 is still possible, VMid failed "]
+                                            "The solution is a positive integer, so Case 5 is still possible, VMid failed "]
                                 fail = true
                             end
                         end
@@ -466,7 +496,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         else
             if output > 1
-                printfT("Case 3",
+                printfT("Case 5",
                         "All combinations of small and large $vMax-shs are impossible since their total amount can not be $size")
             end
         end
@@ -476,11 +506,8 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         if output > 1
             # Conclude with alpha's value
             printHeader("CONCLUSION")
-            printfT("Compute α",
-                    "Each possible case derives the same lower bound for α that contradicts the assumption",
-                    "",
-                    "All possible cases contradict the assumption iff. α ≥ $alpha")
             printfT("Conclusion",
+                    "All possible cases contradict the assumption iff. α ≥ $alpha",
                     "muffins($m,$s) ≤ α, ∀ α ≥ $alpha",
                     "",
                     "muffins($m,$s) ≤ $alpha")
