@@ -88,33 +88,35 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             printf("No procedures for muffins($m, $s, $alpha)", line=true)
             printEnd()
         end
-        return [b, B, M, S, Nothing]
+        return [b, Nothing]
     end
 
     # Output each procedure
-    if output > 0
-        for k=1:length(procedures)
-            x = procedures[k][1]
-            y = procedures[k][2]
+    M = [unpack(M[i]) for i=1:length(M)]
+    S = [unpack(S[i]) for i=1:length(S)]
+    formatProc = []
+    for k=1:length(procedures)
+        x = procedures[k][1]
+        y = procedures[k][2]
 
-            divide = ["Divide $(Int64(x[i])) muffins {$(unpack(M[i]))}" for i=1:length(M) if x[i] > 0]
-            give = ["Give $(Int64(y[i])) students {$(unpack(S[i]))}" for i=1:length(S) if y[i] > 0]
+        divide = ["Divide $(Int64(x[i])) muffins {$(join(M[i], ","))}" for i=1:length(M) if x[i] > 0]
+        give = ["Give $(Int64(y[i])) students {$(join(S[i], ","))}" for i=1:length(S) if y[i] > 0]
+        append!(formatProc, [[[[Int64(x[i]), M[i]] for i=1:length(M)], [[Int64(y[i]), S[i]] for i=1:length(S)]]])
 
-            if output > 1
-                printfT("Procedure $k",
-                        divide...,
-                        give...)
-            else
-                printfT("Procedure",
-                        divide...,
-                        give...)
-                break
-            end
+        if output > 1
+            printfT("Procedure $k",
+                    divide...,
+                    give...)
+        elseif output > 0
+            printfT("Procedure",
+                    divide...,
+                    give...)
+            output = 0
         end
-        printEnd()
     end
+    output > 0 && printEnd()
 
-    [b, B, M, S, procedures]
+    [b, formatProc]
 end
 
 # Helper function for findproc -- "vectorizes" arrays in set S based on B
@@ -124,7 +126,7 @@ end
 
 # Helper function for findproc -- "unpacks" vectors into strings based on B
 function unpack(V)
-    join(vcat(map(i->repeat([B[i]], V[i]), 1:length(V))...), ", ")
+    vcat(map(i->repeat([B[i]], V[i]), 1:length(V))...)
 end
 
 # Helper function for findproc -- "recursively" determines k-size subsets of B[1:i] that sum to T
