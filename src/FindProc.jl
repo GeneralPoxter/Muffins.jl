@@ -12,7 +12,7 @@ B = []
 memo = Dict()
 
 # Determines procedure with minimum piece size alpha -- Work in progress
-function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=1)
+function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     output > 0 && printHeader(center("FIND PROCEDURE"))
 
     # Clear globals
@@ -28,7 +28,7 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=1)
 
     M = []
     S = []
-    solutions = []
+    procedures = []
 
     try
         # Determine vector sets
@@ -58,14 +58,14 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=1)
         for i=1:min(length(M), 3)
             @objective(model, Min, x[i])
             optimize!(model)
-            append!(solutions, [[round.(value.(x)), round.(value.(y))]])
+            append!(procedures, [[round.(value.(x)), round.(value.(y))]])
             
             @objective(model, Max, x[i])
             optimize!(model)
-            append!(solutions, [[round.(value.(x)), round.(value.(y))]])
+            append!(procedures, [[round.(value.(x)), round.(value.(y))]])
         end
 
-        solutions = unique(solutions)
+        procedures = unique(procedures)
     catch
         # TODO -- implement error reporting
         Nothing
@@ -73,43 +73,47 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=1)
 
     alpha = formatFrac(alpha)
 
-    # Display solutions
+    # Display procedures
     if output > 0
-        printHeader("OVERVIEW")
-        printfT("Goal",
-                "Find procedures for dividing $m muffins among $s students where $alpha is the smallest piece size")
-        printfT("Note",
+        printfT("Overview",
+                "Find procedures for dividing $m muffins among $s students where $alpha is the smallest piece size",
+                "",
                 "Let the common denominator be $b")
-
-        printHeader("SOLUTIONS")
     end
 
-    # Exit if no solutions
-    if length(solutions) == 0
+    # Exit if no procedures
+    if length(procedures) == 0
         if output > 0
-            printf("No solutions for muffins($m, $s, $alpha)", line=true)
+            printf("No procedures for muffins($m, $s, $alpha)", line=true)
             printEnd()
         end
         return [b, B, M, S, Nothing]
     end
 
-    # Output each solution
+    # Output each procedure
     if output > 0
-        for k=1:length(solutions)
-            x = solutions[k][1]
-            y = solutions[k][2]
+        for k=1:length(procedures)
+            x = procedures[k][1]
+            y = procedures[k][2]
 
             divide = ["Divide $(Int64(x[i])) muffins {$(unpack(M[i]))}" for i=1:length(M) if x[i] > 0]
             give = ["Give $(Int64(y[i])) students {$(unpack(S[i]))}" for i=1:length(S) if y[i] > 0]
 
-            printfT("Solution $k",
-                    divide...,
-                    give...)
+            if output > 1
+                printfT("Procedure $k",
+                        divide...,
+                        give...)
+            else
+                printfT("Procedure",
+                        divide[1],
+                        give[1])
+                break
+            end
         end
         printEnd()
     end
 
-    return [b, B, M, S, solutions]
+    return [b, B, M, S, procedures]
 end
 
 # Helper function for findproc -- "vectorizes" arrays in set S based on B

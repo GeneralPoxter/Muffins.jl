@@ -29,7 +29,7 @@ An upper bound `α` for `muffins(m, s)` is determined by testing `(m, s)` on all
 
 ### Bounding methods
 #### Floor-Ceiling Theorem
-Run `Muffins.fc(m, s)`^ to apply the Floor-Ceiling Theorem on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
+Run `Muffins.fc(m, s)`* to apply the Floor-Ceiling Theorem on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
 
 #### Half Method
 Run `Muffins.half(m, s)`* to apply the Half Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
@@ -46,25 +46,17 @@ Optionally run `Muffins.vmid(m, s, α)`* to verify whether the Midpoint Method c
 <!--- More method documentation to come -->
 
 ### FindProc
-Run `Muffins.findproc(m, s, α)`^ to display potential procedures/solutions for dividing `m` muffins among `s` students where `α` is the smallest muffin piece cut. A solutions array is returned.
+Run `Muffins.findproc(m, s, α)`* to display potential procedures/solutions for dividing `m` muffins among `s` students where `α` is the smallest muffin piece cut. A solutions array is returned.
 
 ### Matrix Solve
 Run `Muffins.solve(m, s)` to apply linear algebra to find `muffins(m, s)`. The solution is returned. This is a work in progress in terms of speed and accuracy.
 
 ### Output mode
-A symbol (* or ^) is placed next to methods which have an optional `output` argument, which can be set to an integer that determines how much text the method displays.
+A an asterisk (*) is placed next to methods which have an optional `output` argument, which can be set to an integer that determines how much text the method displays:
 
-#### For methods with an asterisk (*):  
 + Set `output` to `0` for no printing or result display
 + Set `output` to `1` for result display without proofs
 + Set `output` to `2` for detailed proofs and result display  
 
 For example, `Muffins.half(m, s, output=1)` will display the results of the Half Method without a proof.  
 By default, `output` is set to `1` for `Muffins.muffins(m, s)` and `2` for other asterisk methods.
-
-#### For methods with a carat (^):
-+ Set `output` to `0` for no printing and result display
-+ Set `output` to `1` for result display
-
-For example, `Muffins.findproc(m, s, alpha, output=0)` will not print anything and only return a solutions array.  
-By default, `output` is set to `1` for carat methods.

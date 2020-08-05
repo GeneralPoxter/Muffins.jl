@@ -59,9 +59,8 @@ function muffins(m::Int64, s::Int64; output::Int64=1)
         return 1
     end
 
-    findproc(m, s, alpha, output=max(0, output-1))
-    output > 1 ? up = "⮥" : up = ""
-    disp && println("\nFindProc found optimal α to be a lower bound as well $up")
+    findproc(m, s, alpha, output=output)
+    disp && println("\nFindProc found optimal α to be a lower bound as well ⮥")
     disp && println("\nmuffins($m,$s) = $(numerator(alpha))/$(denominator(alpha))")
     alpha
 end
