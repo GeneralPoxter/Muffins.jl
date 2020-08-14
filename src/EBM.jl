@@ -124,7 +124,7 @@ printfT("Note", "Let the common denominator $den. Therefore, alpha will be refer
 printHeader("DEFINING TERMS FOR EBM ALGORITHM: ")
 printfT("Variables", "We will use the following variables for the EBM algorithm (where m=muffins and s=students):", "", "d = m-s = $d", "",
 "k is the largest number >= 0 such that 3dk > s. k = $k.", "", "a = s - 3dk = $a")
-printfT("Common Terms", "A buddy of ") #finish def of buddy and match
+printfT("Common Terms", "A buddy of share size x is equal to 1-x. A match of share size y is equal to $m/$s-y.")
 
 if a == 2*d
     a= fc(m,s)
