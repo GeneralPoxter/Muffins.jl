@@ -102,49 +102,77 @@ end
 #Verifies that with an input of a,d,k,X, f(3dk+a+d, 3dk+a) ≤ (dk+X)/(3dk+a), ouputs proof if wanted
 function VHBM(X,a,d,k, output::Int64=2)
 
-output>0&&printHeader(center("HARD-BUDDY MATCH PROOF"))
+output>0&&printHeader(center("VERIFY HARD-BUDDY MATCH"))
 #pre-processing stage: checks for a bad input
 pre=true
 alpha=(d*k+X)//(3*d*k+a)
 muffins = 3*d*k+a+d
 students=3*d*k+a
 V = Int64(ceil(2*muffins/students))
-print(muffins, students, V)
+comden=3*d*k+a
 
 #formatting
 alphaS=formatFrac(alpha)
 
-if a<1 || a>(3*d)
-    if output>0
-        printf("Bad input, a is less than 1 or greater than 3d ($(3*d)).")
-        printEnd()
-    end
-    return false
-elseif a==(2*d) #use FC
+output>1&&printHeader("PREPROCESSING STAGE: ")
+
+if a==(2*d) #use FC
     alpha=fc(muffins, students)
     pre=true
-elseif X<a//3
+    if output>1
+        printf("Inputs are verified.")
+    end
+end
+
+
+if X>=a//3 && a>(2*d+1) && a<(3*d-1) #theorem 10.11.1 in muffins book, we assume a is in that interval
+    pre=true
+    if output>1
+        printf("Inputs are verified.")
+    end
+end
+
+if X>=(a//2) #theorem 10.11.2, we assume X<a/2
+    pre=true
+    if output>1
+        printf("Inputs are verified.")
+    end
+end
+if X>=(a+d)//4 #theorem 10.11.3, we assume X<(a+d)/4
+    pre=true
+    if output>1
+        printf("Inputs are verified.")
+    end
+end
+
+if a<1 || a>(3*d)
+    pre=false
     if output>0
-        printf("Bad input, X is less than a/3 ($(a//3)).")
+        printf("Bad input, VHBM failed. a ∉ {1...$(3*d)}.")
         printEnd()
     end
     return false
-elseif X>=a//3 && a>(2*d+1) && a<(3*d-1) #theorem 10.11.1 in muffins book, we assume a is in that interval
-    pre=true
-elseif X>=(a//2) #theorem 10.11.2, we assume X<a/2
-    pre=true
-elseif X>=(a+d)//4 #theorem 10.11.3, we assume X<(a+d)/4
-    pre=true
 end
+
+if X<a//3
+    pre=false
+    if output>0
+        printf("Bad input, VHBM failed. X is less than a/3 ($(a//3)).")
+        printEnd()
+    end
+    return false
+end
+
+output>1&&printf("END OF PREPROCESSING STAGE.")
 
 if pre&&V==3
 
     if output>1 #start of proof
-        printHeader("CLAIM:")
+        printHeader("START OF PROOF:")
         printf("Assume, by way of contradiction, there is a ($muffins, $students) procedure where the smallest piece is > $alphaS.", "",
         "We are looking for a contradiction.")
+        printLine()
 
-        printHeader("SOLVING FOR SHARES:")
         printfT("Solving for students and shares", "Every student has $(V) or $(V-1) shares.", "", "Let s₂ and s₃ equal the number of 2 and 3-students.",
         "", "s₂ = $(3*d*k+a-2*d). There are $(6*d*k+2*a-4*d) 2-shares.", "", "
         s₃ = $(2*d). There are $(6*d) 3-shares.")
@@ -152,11 +180,112 @@ if pre&&V==3
         printHeader("DEFINING TERMS FOR ALGORITHM: ")
         printfT("Variables", "We will use the following variables for the HBM algorithm (where m=muffins and s=students):", "", "d = m-s = $d", "",
         "k is the largest number >= 0 such that 3dk > s. k = $k.", "", "a = s - 3dk = $a")
-        printfT("Common Terms", "A buddy of share size x is equal to 1-x. A match of share size y is equal to $muffins/$students-y.")
+
+        printfT("Note", "A buddy of share size x is equal to 1-x. A match of share size y is equal to $muffins/$students-y.")
+
+
+#variables for interval diagram
+x = (d*k+a+d-2*X)//(comden)
+y=(d*k+d+X)//comden
+alphabuddy = 1-alpha
+#formatting
+den=denominator(alpha)
+xS, yS, aB =formatFrac(x, den), formatFrac(y, den), formatFrac(alphabuddy)
+
+bij1, bij2=formatFrac((2*d*k+a-d-X)//comden, den), formatFrac((2*d*k-d+2*X)//comden)
+int1, int2=formatFrac(((d*k+a-X)//comden), den), formatFrac(((d*k+2X)//comden), den)
+int3, int4 = formatFrac((2*d*k+a-2*X)//comden, den), formatFrac((2*d*k+X)//comden, den)
+bound1S=formatFrac((d*k+a-X)//comden, den)
+
+
+
+        printHeader("INTERVAL DIAGRAM:")
+        printf("The following diagram depicts what we know so far: ")
+        println("\n",
+        interval(["(", "$alphaS"],
+                [")[", "$xS"],
+                ["](", "$yS"],
+                [")", "$aB"],
+                labels=["$(V)s_$V $V-shs", "0", "$(V-1)s_$(V-1) $(V-1)-shs"]))
+        printf("The assumption that X ≥ $(a//3) ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
+        printLine()
+
+        #problems with printing correct bijections
+        printfT("Buddy/Match Bijections", "We define the following (where B signifies buddying and M signifies matching):", "", "M₀ = [$xS, $yS]",
+        "B₀ = B(M₀) = [$bij1, $bij2]", "", "∀ ≤ i ≤ $(k-1), [Mᵢ = M(Bᵢ₋₁) = [($(d*k+a)+$d(i+1)-2X)/$comden, ($(d*k)+$(d)(i+1)+X)/$comden)]",
+        "", "∀ ≤ i ≤ $(k-1), [Bᵢ = B(Mᵢ) = [($(2*d*k+a-X)-$(d)(i+1))/$comden, ($(2*d*k+2*X)-$(d)(i+1))/$comden)]") #printing bijections
+
+        printfT("Note", "Since M₀ is empty, so is the Mᵢ's' and Bᵢ's.",
+        "Bκ₋₁ = [$int1, $int2] is also empty. We want this to be in the 3-shares.", "",
+        "Therefore, we want $int2 < $(xS). This is true.")
+
+#formatting issues
+z=2*a+2*d
+        printHeader("INTERVAL ANALYSIS CONT.:")
+        printf("Let the number of shares in [$alphaS, $bound1S] be 𝑧.")
+        printfT("HBM Algorithm", "Algorithm proves through buddy-match bijections that 𝑧 = 2a+2d = $(z).", "",
+        "For complete proof, read HBM chapter of Muffins Book (page 176-177).")
+        printf("The following picture captures what we know. ")
+
+
+        printf("3-shares:")
+        println("\n",
+        interval(["(", "$alphaS"],
+                [")[", "$int1"],
+                ["](", "$int2"],
+                [")[", "$xS"],
+                ["]", "$yS"],
+                labels=["$z 3-shs", "0", "$(6*d-z) 3-shs", "0"]))
+        println()
+
+        printf("2-shares: ")
+        println("\n",
+        interval(["(", "$yS"],
+                [")[", "$bij1"],
+                ["]", "$bij2"],
+                labels=["$(6*d*k-10*d+2*a) 3-shs", "0"]))
+        println("\n",
+        interval(["(", "$bij2"],
+                [")[", "$int3"],
+                ["](", "$int4"],
+                [")", "$aB"],
+                labels=["$(6*d-z) 2-shs", "0", "$z 2-shs"]))
+
+        printLine()
+
+        casekey, casenum, endsum =k//2, 1, 1
+        midpoint = endsum *1//2
+        parity, ivalue, method = "even", "k/2", "buddying"
+
+        if k%2!=0
+            casekey, casenum, endsum = (k+1)//2, 2, (3*d*k+a+d)//comden
+            midpoint = endsum* 1//2
+            parity, ivalue, method = "odd", "(k+1)/2", "matching"
+        end
+
+
+        sym1 = formatFrac((d*k+casekey*d+X)//comden, den)
+        sym2 = formatFrac((d*k+a+d*casekey-X)//comden, den)
+
+        printHeader("CASES:")
+        printfT("Case $casenum", "k ($k) is $parity. Let i = $ivalue = $casekey.", "", "Mᵢ = [$sym1, $sym2].", "",
+        "The sum of the endpoints is $endsum, so the midpoint is $midpoint. So, Mκ/2 is symmetric by $method.")
+
+        int5 = formatFrac((d*k+a//2)//comden, den)
+        printf("The following is what we know about the 3-shares: ")
+        println("\n",
+        interval(["(", "$alphaS"],
+                ["|", "$int5"],
+                [")[", "$int1"],
+                ["](", "$int2"],
+                [")", "$xS"],
+                labels=["$(a+d)", "$(a+d)","0",  "$(4*d-2*a) 3-shs"]))
+        printLine()
+        printfT("Defining intervals", "We define the following intervals: ", "",
+        "J₁ = [$alphaS, $int5], J₂ = [$int5, $int1], J₃ = [$int2, $xS]", "",
+        "J₁ = J₂ = $(a+d)      J₃ = $(4*d-2*a)")
+
     end
-
-
-
 
 
 
