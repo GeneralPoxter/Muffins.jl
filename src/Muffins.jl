@@ -15,6 +15,9 @@ using .Mid
 include("EBM.jl")
 using .EBM
 
+include("HBM.jl")
+using .HBM
+
 include("FindProc.jl")
 using .FindProc
 
@@ -31,7 +34,8 @@ function muffins(m::Int64, s::Int64; output::Int64=1)
                 half(m, s, output=0),
                 int(m, s, output=0),
                 mid(m, s, output=0),
-                ebm(m, s, output=0) ]
+                ebm(m, s, output=0),
+                hbm(m, s, output=0)]
     alpha = minimum(alphas)
     disp = output > 0
 
@@ -51,6 +55,9 @@ function muffins(m::Int64, s::Int64; output::Int64=1)
     elseif alpha == alphas[5]
         ebm(m, s, output=output)
         method = "Easy Buddy Match"
+    elseif alpha == alphas[6]
+        hbm(m, s, output=output)
+        method = "Hard Buddy Match"
     end
     disp && println("\nOptimal α derived by $method ⮥")
 
