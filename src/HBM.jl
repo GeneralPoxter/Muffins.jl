@@ -274,7 +274,7 @@ function VHBM(X,a,d,k, output::Int64=2)
                 labels=["$(a+d)", "$(a+d)","0",  "$(4*d-2*a) 3-shs"]))
                 printLine()
                 printfT("Defining intervals", "We define the following intervals: ", "",
-                "J₁ = [$alphaS, $int5], J₂ = [$int5, $int1], J₃ = [$int2, $xS]", "",
+                "|J₁| = [$alphaS, $int5], |J₂| = [$int5, $int1], |J₃| = [$int2, $xS]", "",
                 "J₁ = J₂ = $(a+d)      J₃ = $(4*d-2*a)")
 
     end
