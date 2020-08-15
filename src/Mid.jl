@@ -6,7 +6,7 @@ using .Computation
 include("Format.jl")
 using .Format
 
-export mid, vmid
+export mid, vmid, combo, comboTup
 
 # Determines upper bound alpha with Midpoint Method, optionally outputs proof
 # Author: Jason Liu
@@ -35,14 +35,12 @@ function mid(m::Int64, s::Int64; output::Int64=2)
     # Compute potential alpha candidates
     alphas = []
     if numW > numV
-        for c=0:W, b=0:(W-c)
-            a = W-b-c
+        for (a, b, c) in comboTup(W, 3)
             append!(alphas, (a//2 + (W)b + c - (1+b)m//s)//((W-1)b + c))            # Value for alpha derived by solving a(1/2) + b(1-y) + c(1-alpha) = m/s
             append!(alphas, ((1-a+c)m//s + (W-1)a - b//2 -c)//((W-1)a + (V-1)c))    # Value for alpha derived by solving a(y) + b(1/2) + c(1-x) = m/s
         end
     elseif numW < numV
-        for c=0:V, b=0:(V-c)
-            a = V-b-c
+        for (a, b, c) in comboTup(V, 3)
             append!(alphas, ((W)a + b//2 - (1+a-c)m//s)//((W-1)a + (V-1)c))         # Value for alpha derived by solving a(1-y) + b(1/2) + c(x) = m/s
             append!(alphas, ((1+b)m//s - b - c//2)//(a + (V-1)b))                   # Value for alpha derived by solving a(alpha) + b(1-x) + c(1/2) = m/s
         end
@@ -310,18 +308,17 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                             [")[", k],
                             ["](", l],
                             [")", alpha1],
-                            labels=["h $W-shs", "h $W-shs", "0", "$numV $W-shs"]))
+                            labels=["z $W-shs", "z $W-shs", "0", "$numV $W-shs"]))
                     printLine()
                     printfT("Note",
                             "We define the following intervals:",
                             "A = ($j,$mid)",
-                            "B = ($mid,$k) (|A| = |B| = h)",
+                            "B = ($mid,$k) (|A| = |B| = z)",
                             "C = ($l,$alpha1) (|C| = $numV)")
                 end
 
                 # Determine possible interval combinations
-                for c=0:W, b=0:(W-c)
-                    a = W-b-c
+                for (a, b, c) in comboTup(W, 3)
                     upperB = a*1//2 + b*toFrac(k) + c*(1-alpha)
                     lowerB = a*toFrac(j) + b*1//2 + c*toFrac(l)
                     if a+b in posCombo && upperB > m//s > lowerB
@@ -338,18 +335,17 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                             ["](", j],
                             ["|", mid],
                             [")", k],
-                            labels=["$numW $V-shs", "0", "h $V-shs", "h $V-shs"]))
+                            labels=["$numW $V-shs", "0", "z $V-shs", "z $V-shs"]))
                     printLine()
                     printfT("Note",
                             "We define the following intervals:",
                             "A = ($alphaF,$i) (|A| = $numW)",
                             "B = ($j,$mid)",
-                            "C = ($mid,$k) (|B| = |C| = h)")
+                            "C = ($mid,$k) (|B| = |C| = z)")
                 end
 
                 # Determine possible interval combinations
-                for c=0:V, b=0:(V-c)
-                    a = V-b-c
+                for (a, b, c) in comboTup(V, 3)
                     upperB = a*toFrac(i) + b*1//2 + c*toFrac(k)
                     lowerB = a*alpha + b*toFrac(j) + c*1//2
                     if a in posCombo && upperB > m//s > lowerB
@@ -370,118 +366,57 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                             "because the range of muffin amounts for the others does not include $size")
                 end
 
-                # Determine if a solvable system of equations is possible
-                # i.e. there are at most 3 possible student types to match 3 intervals
-                if length(posInt) > 3
-                    if output > 1
-                        printfT("System of equations",
-                                "A solvable system of equations could not be set up to see if the above combinations will result in a contradictory non-integer solution, VMid failed")
-                    elseif output > 0
-                        printf("Could not generate conclusive system of equations, VMid failed", line=true)
-                    end
+                # Check if posInt is too large
+                if length(posInt) > 5
+                    output > 0 && printf("The # of possible interval combinations is too large, VMid failed", line=true)
                     return false
                 end
 
                 # Set up and solve system of equations
-                equations = []
-                solutions = []
-                fail = false
                 (a, b, c) = (getindex.(posInt, 1), getindex.(posInt, 2), getindex.(posInt, 3))
-                (z1, Z1, z2, Z2, z3, Z3) = (a, "A", b, "B", c, "C")
+                (A, B, C) = ("A", "B", "C")
                 if numW < numV
-                    (z1, Z1, z2, Z2, z3, Z3) = (b, "B", c, "C", a, "A")
+                    (a, b, c) = (b, c, a)
+                    (A, B, C) = (B, C, A)
                 end
 
-                if length(posInt) == 3
-                    x1 = ((z1[3]-z1[2]+z2[2]-z2[3])numMin + ((z2[3]-z1[3])z3[2]+(z1[2]-z2[2])z3[3])sMax)//((z1[3]-z1[2]+z2[2]-z2[3])z3[1] + (z1[1]-z1[3]+z2[3]-z2[1])z3[2] + (z1[2]-z1[1]+z2[1]-z2[2])z3[3])
-                    x2 = ((z1[3]-z2[3])numMin - ((z1[3]-z2[3])z3[1] + (z2[1]-z1[1])z3[3])*x1)//((z1[3]-z2[3])z3[2] + (z2[2]-z1[2])z3[3])
-                    x3 = sMax-x1-x2
-                    (x1F, x2F, x3F) = (formatFrac(x1), formatFrac(x2), formatFrac(x3))
+                iter = 1:length(posInt)
+                definitions = []
+                for i=iter
+                    append!(definitions, ["where x_$i is the # of students with", "$(a[i]) $A-shs, $(b[i]) $B-shs, $(c[i]) $C-shs"])
+                end
+                equations = [
+                    join(["$(a[i])·x_$i" for i=iter], " + ") * " = " * join(["$(b[i])·x_$i" for i=iter], " + "),
+                    join(["$(c[i])·x_$i" for i=iter], " + ") * " = |$C| = $numMin",
+                    join(["x_$i" for i=iter], " + ") * " = s_$vMax = $sMax",
+                    "",
+                    definitions...
+                ]
 
-                    equations = ["$(z1[1])·x + $(z1[2])·y + $(z1[3])·z = $(z2[1])·x + $(z2[2])·y + $(z2[3])·z",
-                                "$(z3[1])·x + $(z3[2])·y + $(z3[3])·z = |$Z3| = $numMin",
-                                "x + y + z = s_$vMax = $sMax",
-                                "",
-                                "where x is the # of students with",
-                                "$(a[1]) A-shs, $(b[1]) B-shs, and $(c[1]) C-shs",
-                                "and y the # of students with",
-                                "$(a[2]) A-shs, $(b[2]) B-shs, and $(c[2]) C-shs",
-                                "and z the # of students with",
-                                "$(a[3]) A-shs, $(b[3]) B-shs, and $(c[3]) C-shs"]
-
-                    if occursin("/", x1F) || occursin("/", x2F) || x1 < 0 || x2 < 0 || x3 < 0
-                        solutions = ["The solutions are x = $x1F, y = $x2F, z = $x3F",
-                                    "The solutions are not positive integers, so Case 5 is impossible"]
-                    else
-                        solutions = ["The solutions are x = $x1F, y = $x2F, z = $x3F",
-                                    "The solutions are positive integers, so Case 5 is still possible, VMid failed"]
-                        fail = true
+                solution = []
+                for x in combo(sMax, length(iter))
+                    if sum(x.*a) == sum(x.*b) && sum(x.*c) == numMin
+                        solution = [
+                            "One solution is " * join(["x_$i = $(x[i])" for i=iter], ", "),
+                            "The system has a non-negative integer solution, so Case 5 is still possible, VMid failed"
+                        ]
+                        break
                     end
                 end
-                
-                if length(posInt) == 2
-                    x1 = sMax//(1+(z1[1]-z2[1])//(z2[2]-z1[2]))
-                    x2 = sMax-x1
-                    (x1F, x2F) = (formatFrac(x1), formatFrac(x2))
-
-                    equations = ["$(z1[1])·x + $(z1[2])·y = $(z2[1])·x + $(z2[2])·y",
-                                "x + y = s_$vMax = $sMax",
-                                "",
-                                "where x is the # of students with",
-                                "$(a[1]) A-shs, $(b[1]) B-shs, and $(c[1]) C-shs",
-                                "and y the # of students with",
-                                "$(a[2]) A-shs, $(b[2]) B-shs, and $(c[2]) C-shs"]
-                    
-                    if occursin("/", x1F) || x1 < 0 || x2 < 0 
-                        solutions = ["The solutions are x = $x1F, y = $x2F",
-                                    "The solutions are not positive integers, so Case 5 is impossible"]
-                    elseif z3[1]*x1 + z3[2]*x2 != numMin
-                        insert!(equations, 3, "$(z3[1])·x + $(z3[2])·y = |$Z3| = $numMin")
-                        solutions = ["This system has no solutions, so Case 5 is impossible"]
-                    else
-                        solutions = ["The solutions are x = $x1F, y = $x2F", 
-                                    "The solutions are positive integers, so Case 5 is still possible, VMid failed"]
-                        fail = true
-                    end
-                end
-
-                if length(posInt) == 1
-                    equations = ["$(z1[1])·x = $(z2[1])·x",
-                                "x = s_$vMax = $sMax",
-                                "",
-                                "where x is the # of students with $(a[1]) A-shs, $(b[1]) B-shs, and $(c[1]) C-shs"]
-                    
-                    if z1[1] != z2[1]
-                        solutions = ["This system has no solution, so Case 5 is impossible"]
-                    else
-                        x1 = numMin//z3[1]
-                        x1F = formatFrac(x1)
-                        insert!(equations, 3, "$(z3[1])·x = |$Z3| = $numMin")
-                        if occursin("/", x1F)
-                            solutions = ["The solution is x = $x1F",
-                                        "The solution is not a positive integer, so Case 5 is impossible"]
-                        else
-                            if x1 != sMax
-                                solutions = ["This system has no solution, so Case 5 is impossible"]
-                            else
-                                solutions = ["The solution is x = $x1F",
-                                            "The solution is a positive integer, so Case 5 is still possible, VMid failed "]
-                                fail = true
-                            end
-                        end
-                    end
+                if length(solution) == 0
+                    solution = ["The system has no non-negative integer solutions, so Case 5 is impossible"]
                 end
 
                 if output > 1
                     printfT("Midpoint Analysis II",
-                            "Since |$Z1| = |$Z2|, we can set up the following system of equations:",
+                            "Since |$A| = |$B|, we can set up the following system of equations:",
                             "",
                             equations...,
                             "",
-                            solutions...)
+                            solution...)
                 end
 
-                if fail
+                if length(solution) > 1
                     output == 1 && printf("Could not generate conclusive system of equations, VMid failed", line=true)
                     return false
                 end
@@ -520,6 +455,24 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         true
     end
+end
+
+# Helper function for mid and vmid -- determines all non-negative integer combinations of size k that sum to T
+function combo(T, k)
+    if k == 0
+        return [[]]
+    elseif k == 1
+        return [[T]]
+    elseif T == 0
+        return [repeat([0], k)]
+    else
+        return hcat([vcat.([i], combo(T-i, k-1)) for i=0:T]...)
+    end
+end
+
+# Helper function for mid and vmid -- convert the results of combo(T, k) into tuples
+function comboTup(T, k)
+    return [tuple(x...) for x in combo(T, k)]
 end
 
 end

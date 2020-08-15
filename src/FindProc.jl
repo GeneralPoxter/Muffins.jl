@@ -9,23 +9,18 @@ using .Format
 export findproc
 
 B = []
-memo = Dict()
 
 # Determines procedure with minimum piece size alpha -- Work in progress
 # Author: Jason Liu
 function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     output > 0 && printHeader(center("FIND PROCEDURE"))
 
-    # Clear globals
-    global B = []
-    global memo = Dict()
-
     c = numerator(alpha)
     d = denominator(alpha)
     b = lcm(s, d)
 
     a = Int64(b * c / d)
-    B = [x for x in a:(b-a)]
+    global B = [x for x in a:(b-a)]
 
     M = []
     S = []
@@ -119,6 +114,8 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     [b, formatProc]
 end
 
+
+
 # Helper function for findproc -- "vectorizes" arrays in set S based on B
 function vectorize(S)
     S == Nothing ? Nothing : sort([[count(i->(i==x), s) for x in B] for s in S], rev=true)
@@ -129,8 +126,8 @@ function unpack(V)
     vcat(map(i->repeat([B[i]], V[i]), 1:length(V))...)
 end
 
-# Helper function for findproc -- "recursively" determines k-size subsets of B[1:i] that sum to T
-function f(i, T, k)
+# Helper function for findproc -- recursively determines k-size subsets of B[1:i] that sum to T
+function f(i, T, k, memo=Dict())
     # Base cases
     if i >= 1 && T == 0 && k == 0
         Set()
@@ -152,7 +149,7 @@ function f(i, T, k)
         if haskey(memo, (i, T, k))
             get(memo, (i, T, k), 0)
         else
-            set = unionF( f(i-1, T, k), mapCat(f(i, T-B[i], k-1), [B[i]]) )
+            set = unionF( f(i-1, T, k, memo), mapCat(f(i, T-B[i], k-1, memo), [B[i]]) )
             get!(memo, (i, T, k), set)
         end
     end
