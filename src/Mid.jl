@@ -6,7 +6,7 @@ using .Computation
 include("Format.jl")
 using .Format
 
-export mid, vmid, combo, comboTup
+export mid, vmid
 
 # Determines upper bound alpha with Midpoint Method, optionally outputs proof
 # Author: Jason Liu
