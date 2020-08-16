@@ -21,13 +21,13 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
             printf("HBM method does not apply", line=true)
             printEnd()
         end
-        return 1
+        return 1, 1
     elseif m%s == 0
         if output > 0
             printf("Since $m % $s = 0, f($m, $s) = 1.")
             printEnd()
         end
-        return 1
+        return 1, 2
     else
         V = Int64(ceil(2m/s))
         if V==3
@@ -53,6 +53,7 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
                 return alpha
             else
                 X=minimum(Xsolutions)
+                print(a," ", d, " ", k, " ", X)
 
                 #special cases
                 if a==10&&d==7&&m==(21*k+17)&&s==(21*k+10)
@@ -99,6 +100,7 @@ function VHBM(a,d,k,X, output::Int64=2)
     students=3*d*k+a
     V = Int64(ceil(2*muffins/students))
     comden=3*d*k+a
+    print(a,d,k,X)
 
     #formatting
     alphaS=formatFrac(alpha)
@@ -169,32 +171,32 @@ function VHBM(a,d,k,X, output::Int64=2)
             printfT("Note", "A buddy of share size x is equal to 1-x. A match of share size y is equal to $muffins/$students-y.")
         end
 
-            #variables for interval diagram
-            x = (d*k+a+d-2*X)//(comden)
-            y=(d*k+d+X)//comden
-            alphabuddy = 1-alpha
-            #formatting
-            den=denominator(alpha)
-            xS, yS, aB =formatFrac(x, den), formatFrac(y, den), formatFrac(alphabuddy)
+        #variables for interval diagram
+        x = (d*k+a+d-2*X)//(comden)
+        y=(d*k+d+X)//comden
+        alphabuddy = 1-alpha
+        #formatting
+        den=denominator(alpha)
+        xS, yS, aB =formatFrac(x, den), formatFrac(y, den), formatFrac(alphabuddy)
 
-            bij1, bij2=formatFrac((2*d*k+a-d-X)//comden, den), formatFrac((2*d*k-d+2*X)//comden)
-            int1, int2=formatFrac(((d*k+a-X)//comden), den), formatFrac(((d*k+2X)//comden), den)
-            int3, int4 = formatFrac((2*d*k+a-2*X)//comden, den), formatFrac((2*d*k+X)//comden, den)
-            bound1S=formatFrac((d*k+a-X)//comden, den)
-            int5 = formatFrac((d*k+a//2)//comden, den)
+        bij1, bij2=formatFrac((2*d*k+a-d-X)//comden, den), formatFrac((2*d*k-d+2*X)//comden)
+        int1, int2=formatFrac(((d*k+a-X)//comden), den), formatFrac(((d*k+2X)//comden), den)
+        int3, int4 = formatFrac((2*d*k+a-2*X)//comden, den), formatFrac((2*d*k+X)//comden, den)
+        bound1S=formatFrac((d*k+a-X)//comden, den)
+        int5 = formatFrac((d*k+a//2)//comden, den)
 
 
-        if output>1
-            printHeader("INTERVAL DIAGRAM:")
-            printf("The following diagram depicts what we know so far: ")
-            println("\n",
-            interval(["(", "$alphaS"],
+            if output>1
+                printHeader("INTERVAL DIAGRAM:")
+                printf("The following diagram depicts what we know so far: ")
+                println("\n",
+                interval(["(", "$alphaS"],
                     [")[", "$xS"],
                     ["](", "$yS"],
                     [")", "$aB"],
                     labels=["$(V)s_$V $V-shs", "0", "$(V-1)s_$(V-1) $(V-1)-shs"]))
-                    printf("The assumption that X ≥ $(a//3) ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
-                    printLine()
+                printf("The assumption that X ≥ $(a//3) ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
+                printLine()
 
 
                 printfT("Buddy/Match Bijections", "We define the following (where B signifies buddying and M signifies matching):", "", "M₀ = [$xS, $yS]",
@@ -284,10 +286,9 @@ function VHBM(a,d,k,X, output::Int64=2)
         end
     end
 
-len = length(workingcomb)
+    len = length(workingcomb)
 
-
-    if len>0
+    if len>0&&(2,0,1) in workingcomb
         if output>1
             sharecombs = ["$a shares from J1, $b shares in J2, and $c shares in J3" for (a,b,c) in workingcomb]
             printHeader("POSSIBLE SHARES: ")
@@ -295,26 +296,80 @@ len = length(workingcomb)
             "", sharecombs..., "")
         end
 
-        if (2,0,1) in workingcomb
-            if len==1
+        printHeader("EQUATION ANALYSIS:")
+        if len==1
                 if output>1
-                    printHeader("EQUATION ANALYSIS:")
-                    printfT("One-solution equation", "Since there is only 1 solution, we look for a 2d solution in following set of equations:",
-                    "", "2y = a+d = $(a+d)", "", "y = 4d-2a = $(4*d-2*a)", "", "y = 2d = $(2*d)", "Since the equations have a solution from {0...$(2*d)}, VHBM verifies alpha")
+                    printfT("One-variable equation", "Since there is only 1 possible share combination, we look for a 2d solution in following set of equations:",
+                    "", "Equation 1 based on |J₁|+ |J₂| = a+d → 2y₁₁₃ = a+d = $(a+d)", "",
+                    "Equation 2 based on |J₃| = 4d-2a → y₁₁₃ = 4d-2a = $(4*d-2*a)", "", "Equation 3 based on s₃ = 2d → y₁₁₃ = 2d = $(2*d)", "",
+                    "Since y₁₁₃ has a solution from {0...$(2*d)}, VHBM verifies alpha")
                 end
             return true
 
-            elseif len==2
-                if (1,1,1) in workingcomb
-                    return true
-                elseif (0,3,0) in workingcomb
-                    return true
-                else
-                    return false
-                end
-            else
-                return false #to be completed
+        elseif len==2
+            sol=false
+            if (1,1,1) in workingcomb
+                sol=true
+                eq1, eq2, eq3, eq4 = "2y₁₁₃+y₁₂₃", "y₁₂₃", "y₁₁₃+y₁₂₃", "y₁₁₃+y₁₂₃"
+            elseif (0,3,0) in workingcomb
+                sol=true
+                eq1, eq2, eq3, eq4 = "2y₁₁₃", "3y₂₂₂", "y₁₁₃", "y₁₁₃+y₂₂₂"
             end
+
+            if sol
+                if output>1
+                    printfT("Two-variable equations", "We look for a 2d solution in following set of equations:",
+                    "", "Equation 1 based on |J₁|+ |J₂| = a+d → $eq1 = a+d = $(a+d),  $eq2 = a+d = $(a+d)", "",
+                    "Equation 2 based on |J₃| = 4d-2a → $eq3 = 4d-2a = $(4*d-2*a)", "", "Equation 3 based on s₃ = 2d → $eq4= 2d = $(2*d)", "",
+                    "Since y₁₁₃ has a solution from {0...$(2*d)}, VHBM verifies alpha")
+                end
+                return true #verified for 2 variable solutions
+            else
+                if output>1
+                    printf("No 2d solution found with derived 2-variable share combinations, vhbm failed.")
+                end
+                return false
+            end
+        elseif len==3
+            if (1,1,1) in workingcomb&& (1,0,2) in workingcomb
+                sol=true
+                eq1, eq2, eq3, eq4 = "2y₁₁₃+y₁₂₃", "y₁₂₃", "y₁₁₃+y₁₂₃", "y₁₁₃+y₁₂₃"
+            elseif (1,1,1) in workingcomb&& (0,3,0) in workingcomb
+                sol=true
+                eq1, eq2, eq3, eq4 = "2y₁₁₃", "3y₂₂₂", "y₁₁₃", "y₁₁₃+y₂₂₂"
+            elseif (1,2,0) in workingcomb && (0,3,0) in workingcomb
+                sol=true
+            elseif (1,1,1) in workingcomb&& (0,2,1) in workingcomb
+                sol=true
+            end
+
+            if sol
+                return true
+            else
+                return false
+            end
+        elseif len==4
+            if (2,1,0) in workingcomb&& (1,2,0) in workingcomb && (0,3,0) in workincomb
+                sol=true
+                eq1, eq2, eq3, eq4 = "2y₁₁₃+y₁₂₃", "y₁₂₃", "y₁₁₃+y₁₂₃", "y₁₁₃+y₁₂₃"
+            elseif (1,2,0) in workingcomb&& (1,1,1) in workingcomb && (0,3,0) in workincomb
+                sol=true
+                eq1, eq2, eq3, eq4 = "2y₁₁₃", "3y₂₂₂", "y₁₁₃", "y₁₁₃+y₂₂₂"
+            elseif (1,1,1) in workingcomb && (1,0,2) in workingcomb && (0,3,0) in workincomb
+                sol=true
+            elseif (1,1,1) in workingcomb&& (1,0,2) in workingcomb && (0,2,1) in workingcomb
+                sol=true
+            elseif (1,1,1) in workingcomb&& (0,3,0) in workingcomb && (0,2,1) in workingcomb
+                sol=true
+            end
+
+            if sol
+                return true
+            else
+                return false
+            end
+        else
+            return false #to be completed
         end
 
 
@@ -330,7 +385,6 @@ len = length(workingcomb)
             printEnd()
         end
     end
-end
 end
 
 #using COND function and a,d,k values to derive candidates for X
@@ -531,5 +585,4 @@ function combo(T, k)
         return hcat([vcat.([i], combo(T-i, k-1)) for i=0:T]...)
     end
 end
-
 end
