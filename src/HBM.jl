@@ -13,7 +13,7 @@ export hbm, VHBM, COND, Xsol, combs, targperm, Tup, combo
 
 # Determines an upper bound using Hard-Buddy Match methon
 # Author: Antara Hebbar
-function hbm(m::Int64, s::Int64; output::Int64=2)
+function hbm(m::Int64, s::Int64; output::Int64=0)
     output>0&&printHeader(center("HARD-BUDDY MATCH METHOD"))
 
     if m<s|| m<=0 || s<=0
@@ -21,13 +21,13 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
             printf("HBM method does not apply", line=true)
             printEnd()
         end
-        return 1, 1
+        return 1
     elseif m%s == 0
         if output > 0
             printf("Since $m % $s = 0, f($m, $s) = 1.")
             printEnd()
         end
-        return 1, 2
+        return 1
     else
         V = Int64(ceil(2m/s))
         if V==3
@@ -90,7 +90,7 @@ end
 
 
 #Verifies that with an input of a,d,k,X, f(3dk+a+d, 3dk+a) ≤ (dk+X)/(3dk+a), ouputs proof if wanted
-function VHBM(a,d,k,X, output::Int64=2)
+function VHBM(a,d,k,X, output::Int64=0)
 
     output>0&&printHeader(center("VERIFY HARD-BUDDY MATCH"))
     #pre-processing stage: checks for a bad input
