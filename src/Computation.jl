@@ -1,6 +1,6 @@
 module Computation
 
-export sv, findend
+export sv, findend, combo, comboTup
 
 # Determines V, V -1 (abbreviated as W), s_V, and s_W using V-Conjecture
 function sv(m, s)

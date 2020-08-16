@@ -34,7 +34,7 @@ function gap(m::Int64, s::Int64; output::Int64=2)
 end
 
 # Helper function for gap -- verifies whether gap(m, s, alpha) is conclusive
-function vgap(m::Int64, s::Int64; output::Int64=2)
+function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     if m < s || m % s == 0
         output > 0 && printf("VGap does not apply", line=true)
         false
@@ -340,63 +340,88 @@ function vgap(m::Int64, s::Int64; output::Int64=2)
 
                 # Check if posInt is too large
                 if length(posInt) > 5
-                    output > 0 && printf("The # of possible interval combinations is too large, VGap failed", line=true)
-                    return false
-                end
-
-                # Set up and solve system of equations
-                (a, b, c) = (getindex.(posInt, 1), getindex.(posInt, 2), getindex.(posInt, 3))
-                (A, B, C) = ("A", "B", "C")
-                if numW < numV
-                    (a, b, c) = (b, c, a)
-                    (A, B, C) = (B, C, A)
-                end
-
-                iter = 1:length(posInt)
-                definitions = []
-                for i=iter
-                    append!(definitions, ["where x_$i is the # of students with", "$(a[i]) $A-shs, $(b[i]) $B-shs, $(c[i]) $C-shs"])
-                end
-                equations = [
-                    join(["$(a[i])·x_$i" for i=iter], " + ") * " = " * join(["$(b[i])·x_$i" for i=iter], " + "),
-                    join(["$(c[i])·x_$i" for i=iter], " + ") * " = |$C| = $numMin",
-                    join(["x_$i" for i=iter], " + ") * " = s_$vMax = $sMax",
-                    "",
-                    definitions...
-                ]
-
-                solution = []
-                for x in combo(sMax, length(iter))
-                    if sum(x.*a) == sum(x.*b) && sum(x.*c) == numMin
-                        solution = [
-                            "One solution is " * join(["x_$i = $(x[i])" for i=iter], ", "),
-                            "The system has a non-negative integer solution, so Case 5 is still possible"
-                        ]
-                        break
+                    output > 1 && printf("The # of possible interval combinations is too large, skipping Midpoint Analysis", line=true)
+                    solution = [0, 0]
+                else
+                    # Set up and solve system of equations
+                    (a, b, c) = (getindex.(posInt, 1), getindex.(posInt, 2), getindex.(posInt, 3))
+                    (A, B, C) = ("A", "B", "C")
+                    if numW < numV
+                        (a, b, c) = (b, c, a)
+                        (A, B, C) = (B, C, A)
                     end
-                end
-                if length(solution) == 0
-                    solution = ["The system has no non-negative integer solutions, so Case 5 is impossible"]
-                end
 
-                if output > 1
-                    printfT("Midpoint Analysis II",
-                            "Since |$A| = |$B|, we can set up the following system of equations:",
-                            "",
-                            equations...,
-                            "",
-                            solution...)
+                    iter = 1:length(posInt)
+                    definitions = []
+                    for i=iter
+                        append!(definitions, ["where x_$i is the # of students with", "$(a[i]) $A-shs, $(b[i]) $B-shs, $(c[i]) $C-shs"])
+                    end
+                    equations = [
+                        join(["$(a[i])·x_$i" for i=iter], " + ") * " = " * join(["$(b[i])·x_$i" for i=iter], " + "),
+                        join(["$(c[i])·x_$i" for i=iter], " + ") * " = |$C| = $numMin",
+                        join(["x_$i" for i=iter], " + ") * " = s_$vMax = $sMax",
+                        "",
+                        definitions...
+                    ]
+
+                    solution = []
+                    for x in combo(sMax, length(iter))
+                        if sum(x.*a) == sum(x.*b) && sum(x.*c) == numMin
+                            solution = [
+                                "One solution is " * join(["x_$i = $(x[i])" for i=iter], ", "),
+                                "The system has a non-negative integer solution, so Case 5 is still possible"
+                            ]
+                            break
+                        end
+                    end
+                    if length(solution) == 0
+                        solution = ["The system has no non-negative integer solutions, so Case 5 is impossible"]
+                    end
+
+                    if output > 1
+                        printfT("Midpoint Analysis II",
+                                "Since |$A| = |$B|, we can set up the following system of equations:",
+                                "",
+                                equations...,
+                                "",
+                                solution...)
+                    end
                 end
 
                 if length(solution) > 1
                     printHeader("CASE 5: GAP ANALYSIS")
-                    
-                    if (V != 3)
-                        output > 0 && printf("There are no 2-shs involved in Case 5, VGap failed", line=true)
-                        return false
+
+                    if numW > numV
+                        bounds = [(toFrac(j), 1//2), (1//2, toFrac(k)), (toFrac(l), toFrac(alpha1))]
+                    elseif numW < numV
+                        bounds = [(alpha, toFrac(i)), (toFrac(j), 1//2), (1//2, toFrac(k))]
                     end
 
+                    gaps = []
+                    for i=1:3
+                        upper = []
+                        lower = []
+                        fail = true
+                        for int in posInt
+                            if int[i] == 1
+                                fail = false
+                                append!(upper, m//s - sum(getindex.(bounds, 1).*int) + bounds[i][1])
+                                append!(lower, m//s - sum(getindex.(bounds, 2).*int) + bounds[i][2])
+                            elseif int[i] != 0
+                                fail = true
+                                break
+                            end
+                        end
+                        if !fail
+                            append!(gaps, [[i, (minimum(upper), maximum(lower))]])
+                        end
+                    end
 
+                    if length(gaps) == 0
+                        output > 0 && printf("No further gaps could be generated, VGap failed", line=true)
+                        return false
+                    end
+                    
                 end
 
             else

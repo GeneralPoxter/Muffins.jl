@@ -18,6 +18,9 @@ using .EBM
 include("HBM.jl")
 using .HBM
 
+include("Gap.jl")
+using .Gap
+
 #include("FindProc.jl")
 #using .FindProc
 
