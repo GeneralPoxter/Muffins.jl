@@ -457,22 +457,4 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     end
 end
 
-# Helper function for mid and vmid -- determines all non-negative integer combinations of size k that sum to T
-function combo(T, k)
-    if k == 0
-        return [[]]
-    elseif k == 1
-        return [[T]]
-    elseif T == 0
-        return [repeat([0], k)]
-    else
-        return hcat([vcat.([i], combo(T-i, k-1)) for i=0:T]...)
-    end
-end
-
-# Helper function for mid and vmid -- convert the results of combo(T, k) into tuples
-function comboTup(T, k)
-    return [tuple(x...) for x in combo(T, k)]
-end
-
 end
