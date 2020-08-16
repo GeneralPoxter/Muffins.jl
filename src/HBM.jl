@@ -21,7 +21,7 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
             printf("HBM method does not apply", line=true)
             printEnd()
         end
-        return Nothing
+        return 1
     elseif m%s == 0
         if output > 0
             printf("Since $m % $s = 0, f($m, $s) = 1.")
@@ -324,14 +324,11 @@ len = length(workingcomb)
         end
         return false
     end
-
-
-
-
-else
-    if output>0
-        printf("Vhbm failed, hbm method needs students to have $V or $(V-1) shares.")
-        printEnd()
+    else
+        if output>0
+            printf("Vhbm failed, hbm method needs students to have $V or $(V-1) shares.")
+            printEnd()
+        end
     end
 end
 end

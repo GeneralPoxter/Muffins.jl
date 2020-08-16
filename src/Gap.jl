@@ -1,4 +1,4 @@
-module Mid
+module Gap
 
 include("Computation.jl")
 using .Computation
@@ -6,12 +6,12 @@ using .Computation
 include("Format.jl")
 using .Format
 
-export mid, vmid
+export gap, vgap
 
-# Determines upper bound alpha with Midpoint Method, optionally outputs proof
+# Determines upper bound alpha with the Gap Method
 # Author: Jason Liu
-function mid(m::Int64, s::Int64; output::Int64=2)
-    output > 0 && printHeader(center("MIDPOINT METHOD"))
+function gap(m::Int64, s::Int64; output::Int64=2)
+    output > 0 && printHeader(center("GAP METHOD"))
 
     if m < s
         if output > 0
@@ -31,40 +31,12 @@ function mid(m::Int64, s::Int64; output::Int64=2)
     (V, W, sV, sW) = sv(m, s)
     numV = (V)sV
     numW = (W)sW
-
-    # Compute potential alpha candidates
-    alphas = []
-    if numW > numV
-        for (a, b, c) in comboTup(W, 3)
-            append!(alphas, (a//2 + (W)b + c - (1+b)m//s)//((W-1)b + c))            # Value for alpha derived by solving a(1/2) + b(1-y) + c(1-alpha) = m/s
-            append!(alphas, ((1-a+c)m//s + (W-1)a - b//2 -c)//((W-1)a + (V-1)c))    # Value for alpha derived by solving a(y) + b(1/2) + c(1-x) = m/s
-        end
-    elseif numW < numV
-        for (a, b, c) in comboTup(V, 3)
-            append!(alphas, ((W)a + b//2 - (1+a-c)m//s)//((W-1)a + (V-1)c))         # Value for alpha derived by solving a(1-y) + b(1/2) + c(x) = m/s
-            append!(alphas, ((1+b)m//s - b - c//2)//(a + (V-1)b))                   # Value for alpha derived by solving a(alpha) + b(1-x) + c(1/2) = m/s
-        end
-    end
-
-    # Test alpha candidates
-    for alpha in sort(unique(alphas))
-        if denominator(alpha) != 0 && vmid(m, s, alpha, output=0)
-            vmid(m, s, alpha, output=output)
-            return alpha
-        end
-    end
-
-    if output > 0
-        printf("All α candidates were inconclusive, Midpoint Method inconclusive", line=true)
-        printEnd()
-    end
-    1
 end
 
-# Helper function for mid -- verifies whether mid(m, s, alpha) is conclusive
-function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
+# Helper function for gap -- verifies whether gap(m, s, alpha) is conclusive
+function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     if m < s || m % s == 0
-        output > 0 && printf("VMid does not apply", line=true)
+        output > 0 && printf("VGap does not apply", line=true)
         false
     elseif alpha < 1/3
         output > 0 && printfT("No piece size < 1/3", "For m ≥ s, α must be ≥ 1/3")
@@ -125,7 +97,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         
         # Check if V-Conjecture applies
         if m//s * 1//(V+1) > alpha || 1 - m//s * 1//(W-1) > alpha
-            output > 0 && printf("V-Conjecture does not apply, VMid failed", line=true)
+            output > 0 && printf("V-Conjecture does not apply, VGap failed", line=true)
             return false
         end
         
@@ -135,7 +107,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         # Check if FindEnd works
         if x != xOriginal && y != yOriginal
-            output > 0 && printf("FindEnd inconclusive, VMid failed", line=true)
+            output > 0 && printf("FindEnd inconclusive, VGap failed", line=true)
             return false
         end
 
@@ -226,13 +198,13 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 end
 
                 printfT("Case 5",
-                        "The Midpoint Method is inconclusive on these intervals, VMid failed")
+                        "The Gap Method is inconclusive on these intervals, VGap failed")
             end
         end
         
         # Fail if interval inconclusive
         if x > y || x == alpha || y == 1-alpha
-            output == 1 && printf("Could not generate disjoint intervals, VMid failed", line=true)
+            output == 1 && printf("Could not generate disjoint intervals, VGap failed", line=true)
             return false
         end
         
@@ -368,57 +340,88 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
                 # Check if posInt is too large
                 if length(posInt) > 5
-                    output > 0 && printf("The # of possible interval combinations is too large, VMid failed", line=true)
-                    return false
-                end
-
-                # Set up and solve system of equations
-                (a, b, c) = (getindex.(posInt, 1), getindex.(posInt, 2), getindex.(posInt, 3))
-                (A, B, C) = ("A", "B", "C")
-                if numW < numV
-                    (a, b, c) = (b, c, a)
-                    (A, B, C) = (B, C, A)
-                end
-
-                iter = 1:length(posInt)
-                definitions = []
-                for i=iter
-                    append!(definitions, ["where x_$i is the # of students with", "$(a[i]) $A-shs, $(b[i]) $B-shs, $(c[i]) $C-shs"])
-                end
-                equations = [
-                    join(["$(a[i])·x_$i" for i=iter], " + ") * " = " * join(["$(b[i])·x_$i" for i=iter], " + "),
-                    join(["$(c[i])·x_$i" for i=iter], " + ") * " = |$C| = $numMin",
-                    join(["x_$i" for i=iter], " + ") * " = s_$vMax = $sMax",
-                    "",
-                    definitions...
-                ]
-
-                solution = []
-                for x in combo(sMax, length(iter))
-                    if sum(x.*a) == sum(x.*b) && sum(x.*c) == numMin
-                        solution = [
-                            "One solution is " * join(["x_$i = $(x[i])" for i=iter], ", "),
-                            "The system has a non-negative integer solution, so Case 5 is still possible, VMid failed"
-                        ]
-                        break
+                    output > 1 && printf("The # of possible interval combinations is too large, skipping Midpoint Analysis", line=true)
+                    solution = [0, 0]
+                else
+                    # Set up and solve system of equations
+                    (a, b, c) = (getindex.(posInt, 1), getindex.(posInt, 2), getindex.(posInt, 3))
+                    (A, B, C) = ("A", "B", "C")
+                    if numW < numV
+                        (a, b, c) = (b, c, a)
+                        (A, B, C) = (B, C, A)
                     end
-                end
-                if length(solution) == 0
-                    solution = ["The system has no non-negative integer solutions, so Case 5 is impossible"]
-                end
 
-                if output > 1
-                    printfT("Midpoint Analysis II",
-                            "Since |$A| = |$B|, we can set up the following system of equations:",
-                            "",
-                            equations...,
-                            "",
-                            solution...)
+                    iter = 1:length(posInt)
+                    definitions = []
+                    for i=iter
+                        append!(definitions, ["where x_$i is the # of students with", "$(a[i]) $A-shs, $(b[i]) $B-shs, $(c[i]) $C-shs"])
+                    end
+                    equations = [
+                        join(["$(a[i])·x_$i" for i=iter], " + ") * " = " * join(["$(b[i])·x_$i" for i=iter], " + "),
+                        join(["$(c[i])·x_$i" for i=iter], " + ") * " = |$C| = $numMin",
+                        join(["x_$i" for i=iter], " + ") * " = s_$vMax = $sMax",
+                        "",
+                        definitions...
+                    ]
+
+                    solution = []
+                    for x in combo(sMax, length(iter))
+                        if sum(x.*a) == sum(x.*b) && sum(x.*c) == numMin
+                            solution = [
+                                "One solution is " * join(["x_$i = $(x[i])" for i=iter], ", "),
+                                "The system has a non-negative integer solution, so Case 5 is still possible"
+                            ]
+                            break
+                        end
+                    end
+                    if length(solution) == 0
+                        solution = ["The system has no non-negative integer solutions, so Case 5 is impossible"]
+                    end
+
+                    if output > 1
+                        printfT("Midpoint Analysis II",
+                                "Since |$A| = |$B|, we can set up the following system of equations:",
+                                "",
+                                equations...,
+                                "",
+                                solution...)
+                    end
                 end
 
                 if length(solution) > 1
-                    output == 1 && printf("Could not generate conclusive system of equations, VMid failed", line=true)
-                    return false
+                    printHeader("CASE 5: GAP ANALYSIS")
+
+                    if numW > numV
+                        bounds = [(toFrac(j), 1//2), (1//2, toFrac(k)), (toFrac(l), toFrac(alpha1))]
+                    elseif numW < numV
+                        bounds = [(alpha, toFrac(i)), (toFrac(j), 1//2), (1//2, toFrac(k))]
+                    end
+
+                    gaps = []
+                    for i=1:3
+                        upper = []
+                        lower = []
+                        fail = true
+                        for int in posInt
+                            if int[i] == 1
+                                fail = false
+                                append!(upper, m//s - sum(getindex.(bounds, 1).*int) + bounds[i][1])
+                                append!(lower, m//s - sum(getindex.(bounds, 2).*int) + bounds[i][2])
+                            elseif int[i] != 0
+                                fail = true
+                                break
+                            end
+                        end
+                        if !fail
+                            append!(gaps, [[i, (minimum(upper), maximum(lower))]])
+                        end
+                    end
+
+                    if length(gaps) == 0
+                        output > 0 && printf("No further gaps could be generated, VGap failed", line=true)
+                        return false
+                    end
+                    
                 end
 
             else
@@ -448,7 +451,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     "muffins($m,$s) ≤ $alpha")
             printEnd()
         elseif output > 0
-            printfT("Midpoint Method",
+            printfT("Gap Method",
                     "Upper bound α of muffins($m,$s) is $alpha")
             printEnd()
         end
