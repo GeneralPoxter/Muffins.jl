@@ -53,7 +53,6 @@ function hbm(m::Int64, s::Int64; output::Int64=0)
                 return alpha
             else
                 X=minimum(Xsolutions)
-                print(a," ", d, " ", k, " ", X)
 
                 #special cases
                 if a==10&&d==7&&m==(21*k+17)&&s==(21*k+10)
