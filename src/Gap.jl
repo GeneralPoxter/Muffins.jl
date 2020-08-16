@@ -6,7 +6,7 @@ using .Computation
 include("Format.jl")
 using .Format
 
-export gap, vgap
+export gap, vgap, matchF, buddy
 
 # Determines upper bound alpha with the Gap Method
 # Author: Jason Liu
@@ -48,7 +48,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         (V, W, sV, sW) = sv(m, s)
         numV = (V)sV
         numW = (W)sW
-        
+
         # Initialize Interval Method proof
         if output > 1
             # Define and format variables for proof
@@ -66,7 +66,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     "Proven by contradicting the assumption")
 
             printHeader("ASSUMPTION")
-            printfT("Assumption", 
+            printfT("Assumption",
                     "Assume muffins($m,$s) > α ≥ 1/3")
             printfT("Property of Buddies",
                     "Since muffins($m,$s) > 1/3, each muffin must be cut into 2 shs, totaling $(2m) shs",
@@ -94,13 +94,13 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         "Contradicts assumption if α ≥ $b")
             end
         end
-        
+
         # Check if V-Conjecture applies
         if m//s * 1//(V+1) > alpha || 1 - m//s * 1//(W-1) > alpha
             output > 0 && printf("V-Conjecture does not apply, VGap failed", line=true)
             return false
         end
-        
+
         ((_, x), (y, _)) = findend(m, s, alpha, V)
         xOriginal = m//s - alpha*(V-1)
         yOriginal = m//s - (1-alpha)*(V-2)
@@ -201,13 +201,13 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         "The Gap Method is inconclusive on these intervals, VGap failed")
             end
         end
-        
+
         # Fail if interval inconclusive
         if x > y || x == alpha || y == 1-alpha
             output == 1 && printf("Could not generate disjoint intervals, VGap failed", line=true)
             return false
         end
-        
+
         # Define and format variables for proof
         (vMin, vMax, sMin, sMax) = (V, W, sV, sW)
         (i, j, k, l) = (xF, yF, y1, x1)
@@ -218,7 +218,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
             (rngMin, rngMax, rngS, rngL) = ((yF, alpha1), (alphaF, yF), (alphaF, y1), (x1, xF))
         end
         numMin = (vMin)sMin
-        
+
         # Conclude interval case with case by case analysis
         if output > 1
             printfT("Property of Buddies",
@@ -246,7 +246,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         posCombo = []
         for k=0:vMax
             upperB = (vMax-k)*toFrac(rngL[2]) + (k)*toFrac(rngS[2])
-            lowerB = (vMax-k)*toFrac(rngL[1]) + (k)*toFrac(rngS[1]) 
+            lowerB = (vMax-k)*toFrac(rngL[1]) + (k)*toFrac(rngS[1])
             if upperB > m//s > lowerB
                 append!(posCombo, k)
             end
@@ -391,6 +391,40 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 if length(solution) > 1
                     printHeader("CASE 5: GAP ANALYSIS")
 
+                    #restarting: generating buddy/match intervals
+                    elements = [y, (1-alpha)]
+                    newgaps = []
+                    elem1, elem2 = toFrac(xF), toFrac(yF)
+                    gap=true
+
+
+                    if V==3
+                        while gap==true
+                            elem1, elem2 = buddy(elem1, elem2)
+                            if y<=elem1<elem2<=(1-alpha)
+                                append!(newgaps, [elem1, elem2])
+                            else
+                                gap=false
+                            end
+                            elem1, elem2 = matchF(m,s,elem1, elem2)
+                            if y<=elem1<elem2<=(1-alpha)
+                                append!(newgaps, [elem1, elem2])
+                            else
+                                gap=false
+                            end
+                        end
+                        split = [m//(2*s), m//(2*s)]
+                        append!(newgaps, elements)
+                        append!(newgaps, split)
+                        sort!(newgaps)
+                        print(newgaps) #this prints an array of all interval bounds
+                    else
+                        #add here gap generating without buddy/match --> format of this can be changed
+                    end
+
+
+
+
                     if numW > numV
                         bounds = [(toFrac(j), 1//2), (1//2, toFrac(k)), (toFrac(l), toFrac(alpha1))]
                     elseif numW < numV
@@ -421,7 +455,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         output > 0 && printf("No further gaps could be generated, VGap failed", line=true)
                         return false
                     end
-                    
+
                 end
 
             else
@@ -458,6 +492,29 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         true
     end
+end
+
+
+#Helper function for vgap that matches numbers
+function matchF(m,s,frac1::Rational{Int64}, frac2::Rational{Int64})
+    total=m//s
+
+    frac1<frac2 ? m1=frac2 : m1=frac1
+    frac1<frac2 ? m2=frac1 : m2=frac2
+
+return total-m1, total-m2
+
+end
+
+
+#Helper function for vgap, finds buddy of two fractions
+function buddy(frac1::Rational{Int64}, frac2::Rational{Int64})
+
+    frac1<frac2 ? m1=frac2 : m1=frac1
+    frac1<frac2 ? m2=frac1 : m2=frac2
+
+return 1-m1, 1-m2
+
 end
 
 end
