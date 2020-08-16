@@ -1,4 +1,4 @@
-module Mid
+module Gap
 
 include("Computation.jl")
 using .Computation
@@ -6,12 +6,12 @@ using .Computation
 include("Format.jl")
 using .Format
 
-export mid, vmid
+export gap, vgap
 
-# Determines upper bound alpha with Midpoint Method, optionally outputs proof
+# Determines upper bound alpha with the Gap Method
 # Author: Jason Liu
-function mid(m::Int64, s::Int64; output::Int64=2)
-    output > 0 && printHeader(center("MIDPOINT METHOD"))
+function gap(m::Int64, s::Int64; output::Int64=2)
+    output > 0 && printHeader(center("GAP METHOD"))
 
     if m < s
         if output > 0
@@ -31,40 +31,12 @@ function mid(m::Int64, s::Int64; output::Int64=2)
     (V, W, sV, sW) = sv(m, s)
     numV = (V)sV
     numW = (W)sW
-
-    # Compute potential alpha candidates
-    alphas = []
-    if numW > numV
-        for (a, b, c) in comboTup(W, 3)
-            append!(alphas, (a//2 + (W)b + c - (1+b)m//s)//((W-1)b + c))            # Value for alpha derived by solving a(1/2) + b(1-y) + c(1-alpha) = m/s
-            append!(alphas, ((1-a+c)m//s + (W-1)a - b//2 -c)//((W-1)a + (V-1)c))    # Value for alpha derived by solving a(y) + b(1/2) + c(1-x) = m/s
-        end
-    elseif numW < numV
-        for (a, b, c) in comboTup(V, 3)
-            append!(alphas, ((W)a + b//2 - (1+a-c)m//s)//((W-1)a + (V-1)c))         # Value for alpha derived by solving a(1-y) + b(1/2) + c(x) = m/s
-            append!(alphas, ((1+b)m//s - b - c//2)//(a + (V-1)b))                   # Value for alpha derived by solving a(alpha) + b(1-x) + c(1/2) = m/s
-        end
-    end
-
-    # Test alpha candidates
-    for alpha in sort(unique(alphas))
-        if denominator(alpha) != 0 && vmid(m, s, alpha, output=0)
-            vmid(m, s, alpha, output=output)
-            return alpha
-        end
-    end
-
-    if output > 0
-        printf("All α candidates were inconclusive, Midpoint Method inconclusive", line=true)
-        printEnd()
-    end
-    1
 end
 
-# Helper function for mid -- verifies whether mid(m, s, alpha) is conclusive
-function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
+# Helper function for gap -- verifies whether gap(m, s, alpha) is conclusive
+function vgap(m::Int64, s::Int64; output::Int64=2)
     if m < s || m % s == 0
-        output > 0 && printf("VMid does not apply", line=true)
+        output > 0 && printf("VGap does not apply", line=true)
         false
     elseif alpha < 1/3
         output > 0 && printfT("No piece size < 1/3", "For m ≥ s, α must be ≥ 1/3")
@@ -125,7 +97,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         
         # Check if V-Conjecture applies
         if m//s * 1//(V+1) > alpha || 1 - m//s * 1//(W-1) > alpha
-            output > 0 && printf("V-Conjecture does not apply, VMid failed", line=true)
+            output > 0 && printf("V-Conjecture does not apply, VGap failed", line=true)
             return false
         end
         
@@ -135,7 +107,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         # Check if FindEnd works
         if x != xOriginal && y != yOriginal
-            output > 0 && printf("FindEnd inconclusive, VMid failed", line=true)
+            output > 0 && printf("FindEnd inconclusive, VGap failed", line=true)
             return false
         end
 
@@ -226,13 +198,13 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 end
 
                 printfT("Case 5",
-                        "The Midpoint Method is inconclusive on these intervals, VMid failed")
+                        "The Gap Method is inconclusive on these intervals, VGap failed")
             end
         end
         
         # Fail if interval inconclusive
         if x > y || x == alpha || y == 1-alpha
-            output == 1 && printf("Could not generate disjoint intervals, VMid failed", line=true)
+            output == 1 && printf("Could not generate disjoint intervals, VGap failed", line=true)
             return false
         end
         
@@ -368,7 +340,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
                 # Check if posInt is too large
                 if length(posInt) > 5
-                    output > 0 && printf("The # of possible interval combinations is too large, VMid failed", line=true)
+                    output > 0 && printf("The # of possible interval combinations is too large, VGap failed", line=true)
                     return false
                 end
 
@@ -398,7 +370,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     if sum(x.*a) == sum(x.*b) && sum(x.*c) == numMin
                         solution = [
                             "One solution is " * join(["x_$i = $(x[i])" for i=iter], ", "),
-                            "The system has a non-negative integer solution, so Case 5 is still possible, VMid failed"
+                            "The system has a non-negative integer solution, so Case 5 is still possible"
                         ]
                         break
                     end
@@ -417,8 +389,14 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 end
 
                 if length(solution) > 1
-                    output == 1 && printf("Could not generate conclusive system of equations, VMid failed", line=true)
-                    return false
+                    printHeader("CASE 5: GAP ANALYSIS")
+                    
+                    if (V != 3)
+                        output > 0 && printf("There are no 2-shs involved in Case 5, VGap failed", line=true)
+                        return false
+                    end
+
+
                 end
 
             else
@@ -448,31 +426,13 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     "muffins($m,$s) ≤ $alpha")
             printEnd()
         elseif output > 0
-            printfT("Midpoint Method",
+            printfT("Gap Method",
                     "Upper bound α of muffins($m,$s) is $alpha")
             printEnd()
         end
 
         true
     end
-end
-
-# Helper function for mid and vmid -- determines all non-negative integer combinations of size k that sum to T
-function combo(T, k)
-    if k == 0
-        return [[]]
-    elseif k == 1
-        return [[T]]
-    elseif T == 0
-        return [repeat([0], k)]
-    else
-        return hcat([vcat.([i], combo(T-i, k-1)) for i=0:T]...)
-    end
-end
-
-# Helper function for mid and vmid -- convert the results of combo(T, k) into tuples
-function comboTup(T, k)
-    return [tuple(x...) for x in combo(T, k)]
 end
 
 end

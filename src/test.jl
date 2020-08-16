@@ -74,7 +74,7 @@ for case in lines
             res = hbm(m, s, output=0)
         end
 
-        if method == "GAP"
+        if startswith(method, "GAP")
             # res = METHOD(m, s)
         end
         
