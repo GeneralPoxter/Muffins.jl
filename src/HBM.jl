@@ -9,21 +9,11 @@ using .Format
 include("FC.jl")
 using .FC
 
-export hbm
-#=special cases in the book: If a = 10 and d = 7 (note that a 6= 7d
-5 ) then f(21k+17; 21k+
-10)  7k+4
-21k+10: Plug in k = 2 to get f(59; 52)  18
-52 , which is
-Theorem 11.2.
-If a = 4 and d = 3 then f(9k + 7; 9k + 4)  9k+5
-27k+12. Plug in
-k = 2 to get f(25; 22)  23
-66 .=#
+export hbm, VHBM, COND, Xsol, combs, targperm, Tup, combo
 
 # Determines an upper bound using Hard-Buddy Match methon
 # Author: Antara Hebbar
-function hbm(m::Int64, s::Int64; output::Int64=1)
+function hbm(m::Int64, s::Int64; output::Int64=2)
     output>0&&printHeader(center("HARD-BUDDY MATCH METHOD"))
 
     if m<s|| m<=0 || s<=0
@@ -73,12 +63,19 @@ function hbm(m::Int64, s::Int64; output::Int64=1)
                     alpha=(d*k+X)//(3*d*k+a)
                 end
 
-                if output>0
-                    printfT("Deriving alpha", "The derived value for X is $X. f($m, $s) ≤ (dk+X)/(3dk+a).", "",
-                    "Once plugging in d, k, a, and X, the upper bound of hbm($m, $s) is $alpha.")
-                    printEnd()
+                if VHBM(a,d,k,X)
+                    if output>0
+                        printfT("Deriving alpha", "The derived value for X is $X. f($m, $s) ≤ (dk+X)/(3dk+a).", "",
+                        "Once plugging in d, k, a, and X, the upper bound of hbm($m, $s) is $alpha.")
+                        printEnd()
+                    end
+                    return alpha
+                else
+                    if output>0
+                        printf("VHBM does not verify the alpha derived by Hard-Buddy Match.")
+                    end
+                return 1
                 end
-            return alpha
             end
         else
             if output>0
@@ -92,7 +89,7 @@ end
 
 
 #Verifies that with an input of a,d,k,X, f(3dk+a+d, 3dk+a) ≤ (dk+X)/(3dk+a), ouputs proof if wanted
-function VHBM(X,a,d,k, output::Int64=2)
+function VHBM(a,d,k,X, output::Int64=2)
 
     output>0&&printHeader(center("VERIFY HARD-BUDDY MATCH"))
     #pre-processing stage: checks for a bad input
@@ -110,7 +107,6 @@ function VHBM(X,a,d,k, output::Int64=2)
 
     if a==(2*d) #use FC
         alpha=fc(muffins, students)
-        pre=true
         if output>1
             printf("Inputs are verified.")
         end
@@ -118,20 +114,17 @@ function VHBM(X,a,d,k, output::Int64=2)
 
 
     if X>=a//3 && a>(2*d+1) && a<(3*d-1) #theorem 10.11.1 in muffins book, we assume a is in that interval
-        pre=true
         if output>1
             printf("Inputs are verified.")
         end
     end
 
     if X>=(a//2) #theorem 10.11.2, we assume X<a/2
-        pre=true
         if output>1
             printf("Inputs are verified.")
         end
     end
     if X>=(a+d)//4 #theorem 10.11.3, we assume X<(a+d)/4
-        pre=true
         if output>1
             printf("Inputs are verified.")
         end
@@ -174,7 +167,7 @@ function VHBM(X,a,d,k, output::Int64=2)
             "k is the largest number >= 0 such that 3dk > s. k = $k.", "", "a = s - 3dk = $a")
 
             printfT("Note", "A buddy of share size x is equal to 1-x. A match of share size y is equal to $muffins/$students-y.")
-
+        end
 
             #variables for interval diagram
             x = (d*k+a+d-2*X)//(comden)
@@ -188,9 +181,10 @@ function VHBM(X,a,d,k, output::Int64=2)
             int1, int2=formatFrac(((d*k+a-X)//comden), den), formatFrac(((d*k+2X)//comden), den)
             int3, int4 = formatFrac((2*d*k+a-2*X)//comden, den), formatFrac((2*d*k+X)//comden, den)
             bound1S=formatFrac((d*k+a-X)//comden, den)
+            int5 = formatFrac((d*k+a//2)//comden, den)
 
 
-
+        if output>1
             printHeader("INTERVAL DIAGRAM:")
             printf("The following diagram depicts what we know so far: ")
             println("\n",
@@ -263,7 +257,6 @@ function VHBM(X,a,d,k, output::Int64=2)
                 printfT("Case $casenum", "k ($k) is $parity. Let i = $ivalue = $casekey.", "", "Mᵢ = [$sym1, $sym2].", "",
                 "The sum of the endpoints is $endsum, so the midpoint is $midpoint. So, Mκ/2 is symmetric by $method.")
 
-                int5 = formatFrac((d*k+a//2)//comden, den)
                 printf("The following is what we know about the 3-shares: ")
                 println("\n",
                 interval(["(", "$alphaS"],
@@ -271,12 +264,65 @@ function VHBM(X,a,d,k, output::Int64=2)
                     [")[", "$int1"],
                     ["](", "$int2"],
                     [")", "$xS"],
-                labels=["$(a+d)", "$(a+d)","0",  "$(4*d-2*a) 3-shs"]))
+                labels=["$(a+d) 3-shs", "$(a+d) 3-shs","0",  "$(4*d-2*a) 3-shs"]))
                 printLine()
                 printfT("Defining intervals", "We define the following intervals: ", "",
                 "|J₁| = [$alphaS, $int5], |J₂| = [$int5, $int1], |J₃| = [$int2, $xS]", "",
                 "J₁ = J₂ = $(a+d)      J₃ = $(4*d-2*a)")
 
+            end
+
+    # Determine possible share combinations
+    shares = combs(3,3) #not sure if this is necessary
+    workingcomb=[]
+
+    for (a, b, c) in Tup(3, 3)
+        NEsum = a*toFrac(int5) + b*toFrac(int1) + c*x
+        TMsum = a*alpha + b*toFrac(int5) + c*toFrac(int2)
+        if NEsum > muffins//students > TMsum && [a,b,c] in shares
+            append!(workingcomb, [(a, b, c)])
+        end
+    end
+
+len = length(workingcomb)
+
+
+    if len>0
+        if output>1
+            sharecombs = ["$a shares from J1, $b shares in J2, and $c shares in J3" for (a,b,c) in workingcomb]
+            printHeader("POSSIBLE SHARES: ")
+            printfT("Determining share combos", "Given all possible share combos, the only shares from J1, J2, and J3 that are not forbidden are: ",
+            "", sharecombs..., "")
+        end
+
+        if (2,0,1) in workingcomb
+            if len==1
+                if output>1
+                    printHeader("EQUATION ANALYSIS:")
+                    printfT("One-solution equation", "Since there is only 1 solution, we look for a 2d solution in following set of equations:",
+                    "", "2y = a+d = $(a+d)", "", "y = 4d-2a = $(4*d-2*a)", "", "y = 2d = $(2*d)", "Since the equations have a solution from {0...$(2*d)}, VHBM verifies alpha")
+                end
+            return true
+
+            elseif len==2
+                if (1,1,1) in workingcomb
+                    return true
+                elseif (0,3,0) in workingcomb
+                    return true
+                else
+                    return false
+                end
+            else
+                return false #to be completed
+            end
+        end
+
+
+    else
+        if output>1
+            printf("There are no possible share combinations, vhbm failed")
+        end
+        return false
     end
 
 
@@ -287,6 +333,7 @@ else
         printf("Vhbm failed, hbm method needs students to have $V or $(V-1) shares.")
         printEnd()
     end
+end
 end
 
 #using COND function and a,d,k values to derive candidates for X
@@ -386,12 +433,105 @@ function Xsol(a,d,k)
     #end
 end
 
-#Determining if generated X meets condition for vhbm
+#Helper function for Xsol, determines if generated X meets specified condition
 function COND(a,d,X)
     if a//3<=X&& X < min(a//2, (a+d)//4)
         return true
     else
         return false
+    end
+end
+
+#Helper function for VHBM,  returns all permutations from 0 to targ that sum to targ of size n
+function combs(targ::Any,n::Any)
+
+openvec = Vector{Int64}(undef, 0)
+if n==0 #if length is 0, return empty vector
+    return openvec
+else
+
+sol = Vector{Int64}(undef, 0)
+fullsol = Vector{Vector{Int64}}(undef, 0)
+
+
+for i = 0:targ
+    push!(sol, i)
+end
+
+fullsol = reverse.(digits.(0:targ^n-1,base=targ,pad=n))
+len=length(fullsol)
+
+finalsol = Array{Array{Int64,1}}(undef, 0)
+
+for i = 1:len
+    element = fullsol[i]
+    if sum(element)==targ
+        push!(finalsol, element)
+    end
+end
+othersolutions = Array{Array{Int64}}(undef, 0)
+
+othersolutions = targperm(targ, n)
+
+splitting(x, n) = [x[i:min(i+n-1,length(x))] for i in 1:n:length(x)] #function will split targperm output into increments of length n
+
+append!(finalsol, splitting(othersolutions, n))
+
+
+
+end
+end
+
+
+#Helper function for combs, retuns permuations of target number and 0
+
+function targperm(targ, n)
+
+littlesol = Array{Int64, 1}(undef, 0)
+zero = Array{Int64, 1}(undef, 0)
+bigsol = Array{Array{Int64, 1}}(undef, 0)
+answer = Array{Int64, 1}(undef, 0)
+
+for i = 1:n
+    push!(zero, 0)
+    push!(bigsol, zero) #generates n arrays consisting of zeros
+end
+
+
+#combinations of 0 and target number
+index = 1
+for i = 1:n
+    littlesol = bigsol[i];
+    for j = 1:n
+        if index == j
+            littlesol[j] =targ
+            append!(answer, littlesol[j])
+        else
+            littlesol[j]=0
+            append!(answer, littlesol[j])
+        end
+    end
+    index+=1
+
+end
+
+return answer
+
+
+end
+function Tup(T, k)
+    return [tuple(x...) for x in combo(T, k)]
+end
+
+function combo(T, k)
+    if k == 0
+        return [[]]
+    elseif k == 1
+        return [[T]]
+    elseif T == 0
+        return [repeat([0], k)]
+    else
+        return hcat([vcat.([i], combo(T-i, k-1)) for i=0:T]...)
     end
 end
 
