@@ -112,7 +112,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         end
 
         # Define and format variables for proof
-        cd = lcm(s, denominator(x), denominator(y))
+        cd = lcm(s, denominator(x), denominator(y), 2)
         alphaF = formatFrac(alpha, cd)
         alpha1 = formatFrac(1-alpha, cd)
         size = formatFrac(m//s)
