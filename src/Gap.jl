@@ -6,7 +6,7 @@ using .Computation
 include("Format.jl")
 using .Format
 
-export gap, vgap, matchF, buddy
+export gap, vgap, matchF, buddy, buddymatch
 
 # Determines upper bound alpha with the Gap Method
 # Author: Jason Liu
@@ -392,32 +392,32 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     printHeader("CASE 5: GAP ANALYSIS")
 
                     #restarting: generating buddy/match intervals
-                    elements = [y, (1-alpha)]
                     newgaps = []
-                    elem1, elem2 = toFrac(xF), toFrac(yF)
-                    gap=true
-
+                    elem1, elem2 = x, y
 
                     if V==3
-                        while gap==true
-                            elem1, elem2 = buddy(elem1, elem2)
-                            if y<=elem1<elem2<=(1-alpha)
-                                append!(newgaps, [elem1, elem2])
-                            else
-                                gap=false
-                            end
-                            elem1, elem2 = matchF(m,s,elem1, elem2)
-                            if y<=elem1<elem2<=(1-alpha)
-                                append!(newgaps, [elem1, elem2])
-                            else
-                                gap=false
-                            end
-                        end
+                        elements = [y, (1-alpha)]
+                        newgaps = buddymatch(elem1, elem2, y, alpha, m, s)
+
                         split = [m//(2*s), m//(2*s)]
                         append!(newgaps, elements)
                         append!(newgaps, split)
                         sort!(newgaps)
-                        print(newgaps) #this prints an array of all interval bounds
+                        gaplen=1
+                        offset = 1
+                        newgaps = [newgaps[n:n+gaplen] for n=1:offset:length(newgaps)-gaplen] #splits into arrays of 2
+
+                        troubles = []
+                        moregaps = [] #finding troublesome gaps
+                        for i=1:length(newgaps)
+                            share = newgaps[i]
+                            if share[1]==share[2]
+                                append!(troubles, share)
+                            end
+                        end
+
+                        println("First generation of gaps →", newgaps) #this prints an array of all interval bounds
+                        println("Troublesome intervals →", troubles) #this prints the troublesome gaps (gaps that have the same bounds)
                     else
                         #add here gap generating without buddy/match --> format of this can be changed
                     end
@@ -517,4 +517,23 @@ return 1-m1, 1-m2
 
 end
 
+function buddymatch(elem1::Rational{Int64}, elem2::Rational{Int64}, y::Rational{Int64}, alpha::Rational{Int64}, m,s)
+    gap=true
+    newgaps = []
+    while gap==true
+        elem1, elem2 = buddy(elem1, elem2)
+        if y<=elem1<elem2<=(1-alpha)
+            append!(newgaps, [elem1, elem2])
+        else
+            gap=false
+        end
+        elem1, elem2 = matchF(m,s,elem1, elem2)
+        if y<=elem1<elem2<=(1-alpha)
+            append!(newgaps, [elem1, elem2])
+        else
+            gap=false
+        end
+    end
+     return newgaps
+end
 end
