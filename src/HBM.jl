@@ -9,11 +9,11 @@ using .Format
 include("FC.jl")
 using .FC
 
-export hbm, VHBM, COND, Xsol, combs, targperm, Tup, combo
+export hbm, VHBM
 
 # Determines an upper bound using Hard-Buddy Match methon
 # Author: Antara Hebbar
-function hbm(m::Int64, s::Int64; output::Int64=0)
+function hbm(m::Int64, s::Int64; output::Int64=2)
     output>0&&printHeader(center("HARD-BUDDY MATCH METHOD"))
 
     if m<s|| m<=0 || s<=0
@@ -24,7 +24,7 @@ function hbm(m::Int64, s::Int64; output::Int64=0)
         return 1
     elseif m%s == 0
         if output > 0
-            printf("Since $m % $s = 0, f($m, $s) = 1.")
+            printf("Since $m % $s = 0, f($m, $s) = 1.", line=true)
             printEnd()
         end
         return 1
@@ -46,8 +46,7 @@ function hbm(m::Int64, s::Int64; output::Int64=0)
             elseif a==(2*d)
                 alpha = fc(m,s, output=0)
                 if output>0
-                    printf("Since a=2d, hbm($m, $s) = fc($m, $s).
-                    Therefore, upperbound of hbm($m, $s) is $alpha.")
+                    printf("Since a=2d, hbm($m, $s) = fc($m, $s). Therefore, upperbound of hbm($m, $s) is $alpha.", line=true)
                     printEnd()
                 end
                 return alpha
@@ -63,7 +62,7 @@ function hbm(m::Int64, s::Int64; output::Int64=0)
                     alpha=(d*k+X)//(3*d*k+a)
                 end
 
-                if VHBM(a,d,k,X)
+                if VHBM(a,d,k,X, output=output)
                     if output>0
                         printfT("Deriving alpha", "The derived value for X is $X. f($m, $s) ≤ (dk+X)/(3dk+a).", "",
                         "Once plugging in d, k, a, and X, the upper bound of hbm($m, $s) is $alpha.")
@@ -72,7 +71,8 @@ function hbm(m::Int64, s::Int64; output::Int64=0)
                     return alpha
                 else
                     if output>0
-                        printf("VHBM does not verify the alpha derived by Hard-Buddy Match.")
+                        printf("VHBM does not verify the alpha derived by Hard-Buddy Match.", line=true)
+                        printEnd()
                     end
                 return 1
                 end
@@ -80,18 +80,17 @@ function hbm(m::Int64, s::Int64; output::Int64=0)
         else
             if output>0
                 printf("Hard-buddy match method requires that students are given 3-shares and 2-shares.
-                Since in f($m, $s), students are given $V and $(V-1) shares, HBM does not apply here.")
+                Since in f($m, $s), students are given $V and $(V-1) shares, HBM does not apply here.", line=true)
+                printEnd()
             end
-        return 1
+            return 1
         end
     end
 end
 
 
 #Verifies that with an input of a,d,k,X, f(3dk+a+d, 3dk+a) ≤ (dk+X)/(3dk+a), ouputs proof if wanted
-function VHBM(a,d,k,X, output::Int64=0)
-
-    output>0&&printHeader(center("VERIFY HARD-BUDDY MATCH"))
+function VHBM(a,d,k,X; output::Int64=2)
     #pre-processing stage: checks for a bad input
     pre=true
     alpha=(d*k+X)//(3*d*k+a)
@@ -99,7 +98,6 @@ function VHBM(a,d,k,X, output::Int64=0)
     students=3*d*k+a
     V = Int64(ceil(2*muffins/students))
     comden=3*d*k+a
-    print(a,d,k,X)
 
     #formatting
     alphaS=formatFrac(alpha)
@@ -277,7 +275,7 @@ function VHBM(a,d,k,X, output::Int64=0)
     shares = combs(3,3) #not sure if this is necessary
     workingcomb=[]
 
-    for (a, b, c) in Tup(3, 3)
+    for (a, b, c) in comboTup(3, 3)
         NEsum = a*toFrac(int5) + b*toFrac(int1) + c*x
         TMsum = a*alpha + b*toFrac(int5) + c*toFrac(int2)
         if NEsum > muffins//students > TMsum && [a,b,c] in shares
@@ -295,7 +293,7 @@ function VHBM(a,d,k,X, output::Int64=0)
             "", sharecombs..., "")
         end
 
-        printHeader("EQUATION ANALYSIS:")
+        output > 1 && printHeader("EQUATION ANALYSIS:")
         if len==1
                 if output>1
                     printfT("One-variable equation", "Since there is only 1 possible share combination, we look for a 2d solution in following set of equations:",
@@ -534,7 +532,6 @@ end
 
 
 #Helper function for combs, retuns permuations of target number and 0
-
 function targperm(targ, n)
 
 littlesol = Array{Int64, 1}(undef, 0)
@@ -569,19 +566,5 @@ return answer
 
 
 end
-function Tup(T, k)
-    return [tuple(x...) for x in combo(T, k)]
-end
 
-function combo(T, k)
-    if k == 0
-        return [[]]
-    elseif k == 1
-        return [[T]]
-    elseif T == 0
-        return [repeat([0], k)]
-    else
-        return hcat([vcat.([i], combo(T-i, k-1)) for i=0:T]...)
-    end
-end
 end
