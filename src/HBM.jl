@@ -11,7 +11,7 @@ using .FC
 
 export hbm, VHBM
 
-# Determines an upper bound using Hard-Buddy Match methon
+# Determines an upper bound using Hard-Buddy Match method
 # Author: Antara Hebbar
 function hbm(m::Int64, s::Int64; output::Int64=2)
     output>0&&printHeader(center("HARD-BUDDY MATCH METHOD"))
@@ -65,7 +65,7 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
                 if VHBM(a,d,k,X, output=output)
                     if output>0
                         printfT("Deriving alpha", "The derived value for X is $X. f($m, $s) ≤ (dk+X)/(3dk+a).", "",
-                        "Once plugging in d, k, a, and X, the upper bound of hbm($m, $s) is $alpha.")
+                        "Once plugging in d, k, a, and X to HBM algorithm, upper bound $alpha is derived.")
                         printEnd()
                     end
                     return alpha
@@ -154,7 +154,7 @@ function VHBM(a,d,k,X; output::Int64=2)
         if output>1 #start of proof
             printHeader("START OF PROOF:")
             printf("Assume, by way of contradiction, there is a ($muffins, $students) procedure where the smallest piece is > $alphaS.", "",
-            "We are looking for a contradiction.")
+            " We are looking for a contradiction.")
             printLine()
 
             printfT("Solving for students and shares", "Every student has $(V) or $(V-1) shares.", "", "Let s₂ and s₃ equal the number of 2 and 3-students.",
@@ -209,7 +209,7 @@ function VHBM(a,d,k,X; output::Int64=2)
                 printHeader("INTERVAL ANALYSIS CONT.:")
                 printf("Let the number of shares in [$alphaS, $bound1S] be 𝑧.")
                 printfT("HBM Algorithm", "Algorithm proves through buddy-match bijections that 𝑧 = 2a+2d = $(z).", "",
-                "For complete proof, read HBM chapter of Muffins Book (page 176-177).")
+                "For complete derivation of 𝑧, read HBM chapter of Muffins Book (page 176-177).")
                 printf("The following picture captures what we know. ")
 
 
@@ -238,23 +238,23 @@ function VHBM(a,d,k,X; output::Int64=2)
 
                 printLine()
 
-                casekey, casenum, endsum =k//2, 1, 1
-                midpoint = endsum *1//2
+                casekeyS, casenum, endsum =formatFrac(k//2), 1, 1
+                midpointS = formatFrac(endsum *1//2)
                 parity, ivalue, method = "even", "k/2", "buddying"
 
                 if k%2!=0
-                    casekey, casenum, endsum = (k+1)//2, 2, (3*d*k+a+d)//comden
-                    midpoint = endsum* 1//2
+                    casekeyS, casenum, endsum = formatFrac((k+1)//2), 2, (3*d*k+a+d)//comden
+                    midpointS = formatFrac(endsum* 1//2)
                     parity, ivalue, method = "odd", "(k+1)/2", "matching"
                 end
 
 
-                sym1 = formatFrac((d*k+casekey*d+X)//comden, den)
-                sym2 = formatFrac((d*k+a+d*casekey-X)//comden, den)
+                sym1 = formatFrac((d*k+toFrac(casekeyS)*d+X)//comden, den)
+                sym2 = formatFrac((d*k+a+d*toFrac(casekeyS)-X)//comden, den)
 
                 printHeader("CASES:")
-                printfT("Case $casenum", "k ($k) is $parity. Let i = $ivalue = $casekey.", "", "Mᵢ = [$sym1, $sym2].", "",
-                "The sum of the endpoints is $endsum, so the midpoint is $midpoint. So, Mκ/2 is symmetric by $method.")
+                printfT("Case $casenum", "k ($k) is $parity. Let i = $ivalue = $casekeyS.", "", "Mᵢ = [$sym1, $sym2].", "",
+                "The sum of the endpoints is $endsum, so the midpoint is $midpointS. So, Mκ/2 is symmetric by $method.")
 
                 printf("The following is what we know about the 3-shares: ")
                 println("\n",
