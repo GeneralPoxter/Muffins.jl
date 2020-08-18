@@ -1,6 +1,6 @@
 module Computation
 
-export sv, findend, combo, comboTup
+export sv, findend, combo, comboTup, intCombo
 
 # Determines V, V -1 (abbreviated as W), s_V, and s_W using V-Conjecture
 function sv(m, s)
@@ -38,6 +38,25 @@ end
 # Converts the results of combo(T, k) into tuples
 function comboTup(T, k)
     return [tuple(x...) for x in combo(T, k)]
+end
+
+# Given possible combinations of small and large shs (posCombo), determines all possible interval combinations in bounds
+function intCombo(m, s, vMax, bounds, smallBounds, posCombo)
+    posInt = []
+    for tup in comboTup(vMax, length(bounds))
+        upperB = sum(tup.*(getindex.(bounds, 2)))
+        lowerB = sum(tup.*(getindex.(bounds, 1)))
+        numSmall = 0
+        for i=1:length(bounds)
+            if smallBounds[1] <= bounds[i][1] <= bounds[i][2] <= smallBounds[2]
+                numSmall += tup[i]
+            end
+        end
+        if numSmall in posCombo && upperB > m//s > lowerB
+            append!(posInt, [tup])
+        end
+    end
+    return posInt
 end
 
 end

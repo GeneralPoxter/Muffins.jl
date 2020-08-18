@@ -79,7 +79,19 @@ function interval(rngs...; labels=repeat([" "], length(rngs) - 1))
             val *= center(rng[2], width=w)
         end
     end
-    center(int, val)
+    if length(int) > LINE_WIDTH
+        lines = []
+        i = 0
+        while (i)LINE_WIDTH <= length(int)
+            append!(lines, [int[(i)LINE_WIDTH+1:min((i+1)LINE_WIDTH, length(int))],
+                            val[(i)LINE_WIDTH+1:min((i+1)LINE_WIDTH, length(val))],
+                            ""])
+            i += 1
+        end
+        join(lines[1:length(lines)-1], "\n")
+    else
+        center(int, val)
+    end
 end
 
 # Centers text within width spaces

@@ -297,62 +297,33 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         "The # of $vMax-shs in ($j, $mid) is equal to the # of $vMax-shs in ($mid, $k)")
             end
 
-            posInt = []
-            if numW > numV
-                if output > 1
-                    println()
-                    printf("The following intervals capture what we know about the $W-shs:")
-                    println("\n",
-                    interval(["(", j],
-                            ["|", mid],
-                            [")[", k],
-                            ["](", l],
-                            [")", alpha1],
-                            labels=["z $W-shs", "z $W-shs", "0", "$numV $W-shs"]))
-                    printLine()
-                    printfT("Note",
-                            "We define the following intervals:",
-                            "A = ($j,$mid)",
-                            "B = ($mid,$k) (|A| = |B| = z)",
-                            "C = ($l,$alpha1) (|C| = $numV)")
-                end
-
-                # Determine possible interval combinations
-                for (a, b, c) in comboTup(W, 3)
-                    upperB = a*1//2 + b*toFrac(k) + c*(1-alpha)
-                    lowerB = a*toFrac(j) + b*1//2 + c*toFrac(l)
-                    if a+b in posCombo && upperB > m//s > lowerB
-                        append!(posInt, [(a, b, c)])
-                    end
-                end
-            elseif numW < numV
-                if output > 1
-                    println()
-                    printf("The following intervals capture what we know about the $V-shs:")
-                    println("\n",
-                    interval(["(", alphaF],
-                            [")[", i],
-                            ["](", j],
-                            ["|", mid],
-                            [")", k],
-                            labels=["$numW $V-shs", "0", "z $V-shs", "z $V-shs"]))
-                    printLine()
-                    printfT("Note",
-                            "We define the following intervals:",
-                            "A = ($alphaF,$i) (|A| = $numW)",
-                            "B = ($j,$mid)",
-                            "C = ($mid,$k) (|B| = |C| = z)")
-                end
-
-                # Determine possible interval combinations
-                for (a, b, c) in comboTup(V, 3)
-                    upperB = a*toFrac(i) + b*1//2 + c*toFrac(k)
-                    lowerB = a*alpha + b*toFrac(j) + c*1//2
-                    if a in posCombo && upperB > m//s > lowerB
-                        append!(posInt, [(a, b, c)])
-                    end
-                end
+            bounds = [[toFrac(j), 1//2], [1//2, toFrac(k)], [toFrac(l), toFrac(alpha1)]]
+            smallBounds = [toFrac(j), toFrac(k)]
+            intervals = [["(", j], ["|", mid], [")[", k], ["](", l], [")", alpha1]]
+            labels = ["z $W-shs", "z $W-shs", "0", "$numV $W-shs"]
+            intervalDefs = ["A = ($j,$mid)", "B = ($mid,$k) (|A| = |B| = z)", "C = ($l,$alpha1) (|C| = $numV)"]
+            if numW < numV
+                bounds = [[alpha, toFrac(i)], [toFrac(j), 1//2], [1//2, toFrac(k)]]
+                smallBounds = [alpha, toFrac(i)]
+                intervals = [["(", alphaF], [")[", i], ["](", j], ["|", mid], [")", k]]
+                labels = ["$numW $V-shs", "0", "z $V-shs", "z $V-shs"]
+                intervalDefs = ["A = ($alphaF,$i) (|A| = $numW)", "B = ($j,$mid)", "C = ($mid,$k) (|B| = |C| = z)"]
             end
+
+            if output > 1
+                println()
+                printf("The following intervals capture what we know about the $V-shs:")
+                println("\n",
+                interval(intervals...,
+                        labels=labels))
+                printLine()
+                printfT("Note",
+                        "We define the following intervals:",
+                        intervalDefs...)
+            end
+
+            # Determine possible interval combinations
+            posInt = intCombo(m, s, vMax, bounds, smallBounds, posCombo)
 
             if length(posInt) > 0
                 if output > 1
@@ -393,6 +364,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     definitions...
                 ]
 
+                # Test all possible non-negative integer solutions with system
                 solution = []
                 for x in combo(sMax, length(iter))
                     if sum(x.*a) == sum(x.*b) && sum(x.*c) == numMin
