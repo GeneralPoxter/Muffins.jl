@@ -1,7 +1,7 @@
 # Muffins.jl
 **Muffins.jl** is a Julia package for solving the **Muffin Problem**:
 > *Given* __m__ *muffins and* __s__ *students, divide the muffins in such a way that all students can receive equal amounts of muffin.  
-> Determine* __muffins(m, s)__*, the largest possible minimum muffin piece cut*
+> Determine* __muffins(m, s)__*, the smallest piece size in the division of muffins that maximizes the smallest piece*
 
 The Muffin Problem was first proposed by Alan Frank in 2011. Algorithms and solution methods were later extensively developed in *The Muffin Book* (2019), a collaboration between William Gasarch, Erik Metz, Jacob Prinz, and Daniel Smolyak among others.
 

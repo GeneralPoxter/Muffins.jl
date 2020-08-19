@@ -101,7 +101,7 @@ end
 
 # Customize output here ↴
 for x in incorrect
-    if x[2] == "GAP"
+    if x[3] != 1
         println(x)
     end
 end

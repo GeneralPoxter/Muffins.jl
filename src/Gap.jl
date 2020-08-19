@@ -418,87 +418,99 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 if length(solution) > 1
                     output > 1 && printHeader("CASE 5: GAP ANALYSIS")
 
+                    upChr = join('A':'Z')
+                    (loChr, loOrd) = (join('z':-1:'a'), 1)
                     while true
                         # Find gaps
                         gaps = []
+                        equations = []
                         for i=1:length(bounds)
-                            upper = []
-                            lower = []
-                            equations = []
-                            for int in posInt
-                                if int[i] > 0
-                                    intConsts = [int...]
-                                    intConsts[i] -= 1
-                                    (upperConsts, lowerConsts) = (getindex.(bounds, 1), getindex.(bounds, 2))
-                                    (potUpper, potLower) = (m//s-sum(upperConsts.*intConsts), m//s-sum(lowerConsts.*intConsts))
-                                    append!(upper, potUpper)
-                                    append!(lower, potLower)
-                                    append!(equations, ["For interval combination $int:",
-                                                        "There is a $vMax-sh < $size - $(join(["$(intConsts[j])·$(formatFrac(upperConsts[j], cd))" for j=1:length(int)], " - ")) = $(formatFrac(potUpper, cd))",
-                                                        "There is a $vMax-sh > $size - $(join(["$(intConsts[j])·$(formatFrac(lowerConsts[j], cd))" for j=1:length(int)], " - ")) = $(formatFrac(potLower, cd))",
-                                                        ""])
+                            ints = []
+                            for tup in posInt
+                                if tup[i] > 0
+                                    upper = m//s - sum(getindex.(bounds, 1).*tup) + bounds[i][1]
+                                    lower = m//s - sum(getindex.(bounds, 2).*tup) + bounds[i][2]
+                                    disjoint = true
+                                    merged = []
+                                    for j=1:length(ints)
+                                        if upper <= ints[j][1] || ints[j][2] <= lower
+                                            continue
+                                        else
+                                            disjoint = false
+                                            ints[j][1] = min(lower, ints[j][1])
+                                            ints[j][2] = max(upper, ints[j][2])
+                                            append!(merged, j)
+                                        end
+                                    end
+                                    if length(merged) > 1
+                                        append!(ints, [[minimum(ints[j][1] for j in merged), maximum(ints[j][2] for j in merged)]])
+                                        deleteat!(ints, merged)
+                                    end
+                                    if disjoint
+                                        append!(ints, [[lower, upper]])
+                                    end
+                                    append!(equations, ["For $tup-student: all $vMax-shs in interval $(upChr[i]) must lie in [$(formatFrac(lower, cd)), $(formatFrac(upper, cd))]"])
                                 end
                             end
-                            if length(upper) > 0 && length(lower) > 0 && minimum(upper) < maximum(lower)
-                                gap = (minimum(upper), maximum(lower))
-                                if output > 1
-                                    printfT("New Gap",
-                                            equations...,
-                                            "All are satisifed if there is a gap of $vMax-shs in [$(formatFrac(gap[1], cd)), $(formatFrac(gap[2], cd))]")
-                                end
-                                append!(gaps, [gap])
+                            sort!(ints)
+                            append!(equations, [""])
+                            for j=1:length(ints)-1
+                                (a, b, c, d) = (ints[j][2], ints[j+1][1], 1-ints[j+1][1], 1-ints[j][2])
+                                append!(gaps, [[a, b], [c, d]])
+                                append!(equations, ["Gap found: [$(formatFrac(a, cd)), $(formatFrac(b, cd))]", "Its buddy: [$(formatFrac(c, cd)), $(formatFrac(d, cd))]"])
                             end
+                            if length(ints) < 2
+                                append!(equations, ["No gaps found in interval $(upChr[i])"])
+                            end
+                            append!(equations, [""])
                         end
 
-                        # Break if no change
+                        # Break if no gaps found
                         if length(gaps) == 0
                             break
                         end
 
+                        # Sort and merge gaps
+                        sort!(gaps)
+                        mergedGaps = []
+                        i = 1
+                        while i < length(gaps)
+                            if gaps[i][2] < gaps[i+1][1]
+                                append!(mergedGaps, [gaps[i]])
+                            else
+                                append!(mergedGaps, [[gaps[i][1], gaps[i+1][2]]])
+                                i += 1
+                            end
+                            i += 1
+                        end
+                        if i == length(gaps)
+                            append!(mergedGaps, [gaps[i]])
+                        end
+                        gaps = mergedGaps
+
+                        if output > 1
+                            printfT("New Gaps",
+                                    equations...)
+                        end
+
                         # Insert gaps
                         for gap in gaps
-                            (lower, upper) = (gap[1], gap[2])
+                            (l, u) = (gap[1], gap[2])
                             i = 1
                             while i <= length(bounds)
-                                fits = false
-                                intersectsAt = 0
-                                (l, u) = (lower, upper)
                                 (bl, bu) = (bounds[i][1], bounds[i][2])
-                                if bl < l < u < bu
-                                    fits = true
-                                elseif bl < l < bu
-                                    intersectsAt = 1
-                                elseif bl < u < bu
-                                    intersectsAt = 2
-                                else
-                                    (l, u) = (1-upper, 1-lower)
-                                    if bl < l < u < bu
-                                        fits = true
-                                    elseif bl < l < bu
-                                        intersectsAt = 1
-                                    elseif bl < u < bu
-                                        intersectsAt = 2
-                                    end
-                                end
-
-                                j = findall(x->toFrac(x[2])==bu, intervals)[1]
-                                if fits
+                                if bl < l <= u < bu
                                     # Update bounds
                                     insert!(bounds, i+1, [u, bu])
                                     bounds[i][2] = l
                                     # Update intervals
-                                    insert!(intervals, j, ["](", formatFrac(u, cd)])
-                                    insert!(intervals, j, [")[", formatFrac(l, cd)])
-                                elseif intersectsAt == 1
-                                    # Update bounds
-                                    bounds[i][2] = l
-                                    # Update intervals
-                                    intervals[j][2] = formatFrac(l, cd)
-                                elseif intersectsAt == 2
-                                    # Update bounds
-                                    bounds[i][1] = u
-                                    # Update intervals
-                                    intervals[j-1][2] = formatFrac(u, cd)
+                                    for j=2:length(intervals)
+                                        if toFrac(intervals[j-1][2]) == bl && toFrac(intervals[j][2]) == bu
+                                            insert!(intervals, j, ["](", formatFrac(u, cd)])
+                                            insert!(intervals, j, [")[", formatFrac(l, cd)])
+                                            break
+                                        end
+                                    end
                                 end
                                 i += 1
                             end
@@ -520,40 +532,45 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                     end
 
                     # Update labels and intervalDefs
-                    upChr = join('A':'Z')
-                    (loChr, loOrd) = (join('z':-1:'a'), 1)
                     labels = repeat(["0"], length(intervals) - 1)
                     intervalDefs = []
                     buddies = []
                     solidInt = 0
                     visited = []
+                    iter = 1:length(intervals)-1
                     for i=1:length(bounds)
                         if !(i in visited)
                             int = bounds[i]
                             chr = upChr[i]
-                            k = findall(x->toFrac(x[2])==int[1], intervals)[1]
-                            (lower, upper) = (intervals[k][2], intervals[k+1][2])
-                            if int == solid
-                                labels[k] = "$numMin $vMax-shs"
-                                append!(intervalDefs, ["$chr = ($lower, $upper) (|$chr| = $numMin)"])
-                                solidInt = i
-                            else
-                                (chr1, chr2) = (loChr[loOrd], chr)
-                                labels[k] = "$chr1 $vMax-shs"
-                                append!(intervalDefs, ["$chr2 = ($lower, $upper)"])
-                                for j=i:length(bounds)
-                                    intBud = bounds[j]
-                                    chr3 = upChr[j]
-                                    if intBud == [1-int[2], 1-int[1]]
-                                        l = findall(x->toFrac(x[2])==intBud[1], intervals)[1]
-                                        (lowerBud, upperBud) = (intervals[l][2], intervals[l+1][2])
-                                        labels[l] = "$chr1 $vMax-shs"
-                                        append!(intervalDefs, ["$chr3 = ($lowerBud, $upperBud) (|$chr2| = |$chr3| = $chr1)"])
-                                        append!(buddies, [(i, j)])
-                                        append!(visited, j)
+                            for k=iter
+                                if toFrac(intervals[k][2]) == int[1] && toFrac(intervals[k+1][2]) == int[2]
+                                    (lower, upper) = (intervals[k][2], intervals[k+1][2])
+                                    if int == solid
+                                        labels[k] = "$numMin $vMax-shs"
+                                        append!(intervalDefs, ["$chr = ($lower, $upper) (|$chr| = $numMin)"])
+                                        solidInt = i
+                                    else
+                                        (chr1, chr2) = (loChr[loOrd], chr)
+                                        labels[k] = "$chr1 $vMax-shs"
+                                        append!(intervalDefs, ["$chr2 = ($lower, $upper)"])
+                                        for j=i:length(bounds)
+                                            intBud = bounds[j]
+                                            chr3 = upChr[j]
+                                            if intBud == [1-int[2], 1-int[1]]
+                                                for l=iter
+                                                    if toFrac(intervals[l][2]) == intBud[1] && toFrac(intervals[l+1][2]) == intBud[2]
+                                                        (lowerBud, upperBud) = (intervals[l][2], intervals[l+1][2])
+                                                        labels[l] = "$chr1 $vMax-shs"
+                                                        append!(intervalDefs, ["$chr3 = ($lowerBud, $upperBud) (|$chr2| = |$chr3| = $chr1)"])
+                                                        append!(buddies, [(i, j)])
+                                                        append!(visited, j)
+                                                    end
+                                                end
+                                            end
+                                        end
                                     end
+                                    loOrd += 1
                                 end
-                                loOrd += 1
                             end
                         end
                     end
