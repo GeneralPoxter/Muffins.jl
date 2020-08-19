@@ -424,14 +424,29 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         for i=1:length(bounds)
                             upper = []
                             lower = []
+                            equations = []
                             for int in posInt
                                 if int[i] > 0
-                                    append!(upper, m//s - sum(getindex.(bounds, 1).*int) + bounds[i][1])
-                                    append!(lower, m//s - sum(getindex.(bounds, 2).*int) + bounds[i][2])
+                                    intConsts = [int...]
+                                    intConsts[i] -= 1
+                                    (upperConsts, lowerConsts) = (getindex.(bounds, 1), getindex.(bounds, 2))
+                                    (potUpper, potLower) = (m//s-sum(upperConsts.*intConsts), m//s-sum(lowerConsts.*intConsts))
+                                    append!(upper, potUpper)
+                                    append!(lower, potLower)
+                                    append!(equations, ["For interval combination $int:",
+                                                        "There is a $vMax-sh < $size - $(join(["$(intConsts[j])·$(formatFrac(upperConsts[j], cd))" for j=1:length(int)], " - ")) = $(formatFrac(potUpper, cd))",
+                                                        "There is a $vMax-sh > $size - $(join(["$(intConsts[j])·$(formatFrac(lowerConsts[j], cd))" for j=1:length(int)], " - ")) = $(formatFrac(potLower, cd))",
+                                                        ""])
                                 end
                             end
                             if length(upper) > 0 && length(lower) > 0 && minimum(upper) < maximum(lower)
-                                append!(gaps, [(minimum(upper), maximum(lower))])
+                                gap = (minimum(upper), maximum(lower))
+                                if output > 1
+                                    printfT("New Gap",
+                                            equations...,
+                                            "All are satisifed if there is a gap of $vMax-shs in [$(formatFrac(gap[1], cd)), $(formatFrac(gap[2], cd))]")
+                                end
+                                append!(gaps, [gap])
                             end
                         end
 
