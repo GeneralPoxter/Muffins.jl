@@ -4,7 +4,7 @@ using TextWrap
 
 export printf, printfT, printHeader, printEnd, printLine, formatFrac, toFrac, interval, center
 
-LEFT_WIDTH = 45
+LEFT_WIDTH = 50
 RIGHT_WIDTH = 25
 LINE_WIDTH = LEFT_WIDTH + RIGHT_WIDTH
 

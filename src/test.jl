@@ -17,6 +17,9 @@ using .EBM
 include("HBM.jl")
 using .HBM
 
+include("Gap.jl")
+using .Gap
+
 # Make sure test.txt is in the same folder as test.jl
 lines = open("test.txt") do file
     readlines(file)
@@ -74,8 +77,8 @@ for case in lines
             res = hbm(m, s, output=0)
         end
 
-        if startswith(method, "GAP")
-            # res = METHOD(m, s)
+        if method == "GAP"
+            res = gap(m, s, output=0)
         end
         
         if res != 0
@@ -97,3 +100,8 @@ for case in lines
 end
 
 # Customize output here ↴
+for x in incorrect
+    if x[2] == "GAP"
+        println(x)
+    end
+end

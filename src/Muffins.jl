@@ -21,8 +21,8 @@ using .HBM
 include("Gap.jl")
 using .Gap
 
-#include("FindProc.jl")
-#using .FindProc
+include("FindProc.jl")
+using .FindProc
 
 #include("Matrix.jl")
 #using .Matrix
@@ -38,7 +38,8 @@ function muffins(m::Int64, s::Int64; output::Int64=1)
                 int(m, s, output=0),
                 mid(m, s, output=0),
                 ebm(m, s, output=0),
-                hbm(m, s, output=0)]
+                hbm(m, s, output=0),
+                gap(m, s, output=0)]
     alpha = minimum(alphas)
     disp = output > 0
 
@@ -61,14 +62,17 @@ function muffins(m::Int64, s::Int64; output::Int64=1)
     elseif alpha == alphas[6]
         hbm(m, s, output=output)
         method = "Hard Buddy Match"
+    else
+        gap(m, s, output=output)
+        method = "Gap Method"
     end
     disp && println("\nOptimal α derived by $method ⮥")
 
-    #procedures = findproc(m, s, alpha, output=0)[2]
-    #if procedures == Nothing
-    #    disp && println("\nFindProc could not confirm optimal α to be a lower bound\nmuffins($m,$s) failed")
-    #    return 1
-    #end
+    procedures = findproc(m, s, alpha, output=0)[2]
+    if procedures == Nothing
+        disp && println("\nFindProc could not confirm optimal α to be a lower bound\nmuffins($m,$s) failed")
+        return 1
+    end
 
     #findproc(m, s, alpha, output=output)
     disp && println("\nFindProc found optimal α to be a lower bound as well ⮥")

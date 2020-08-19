@@ -1,5 +1,8 @@
 module Mid
 
+using JuMP
+using Cbc
+
 include("Computation.jl")
 using .Computation
 
@@ -77,7 +80,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
         numV = (V)sV
         numW = (W)sW
         
-        # Initialize Interval Method proof
+        # Initialize Midpoint Method proof
         if output > 1
             # Define and format variables for proof
             alphaF = formatFrac(alpha)
@@ -307,7 +310,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 smallBounds = [alpha, toFrac(i)]
                 intervals = [["(", alphaF], [")[", i], ["](", j], ["|", mid], [")", k]]
                 labels = ["$numW $V-shs", "0", "z $V-shs", "z $V-shs"]
-                intervalDefs = ["A = ($alphaF,$i) (|A| = $numW)", "B = ($j,$mid)", "C = ($mid,$k) (|B| = |C| = z)"]
+                intervalDefs = ["A = ($alphaF, $i) (|A| = $numW)", "B = ($j, $mid)", "C = ($mid, $k) (|B| = |C| = z)"]
             end
 
             if output > 1
@@ -327,12 +330,19 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
             if length(posInt) > 0
                 if output > 1
-                    combos = ["$a $vMax-shs from A, $b from B, and $c from C" for (a, b, c) in posInt]
+                    printfT("Note",
+                            "Let the notation (a, b, c, ...) denote a combination of $vMax-shs where there are:",
+                            "a shs in interval A",
+                            "b shs in interval B",
+                            "c shs in interval C",
+                            "...",
+                            "",
+                            "A (a, b, c, ...)-student denotes a student with that combination of $vMax-shs")
                     printfT("Midpoint Analysis I",
                             "Given the possible small and large $vMax-sh combinations,",
                             "all combinations of $vMax-shs from intervals A, B, and C are impossible except for:",
                             "",
-                            combos...,
+                            posInt...,
                             "",
                             "because the range of muffin amounts for the others does not include $size")
                 end
@@ -352,30 +362,34 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 end
 
                 iter = 1:length(posInt)
-                definitions = []
-                for i=iter
-                    append!(definitions, ["where x_$i is the # of students with", "$(a[i]) $A-shs, $(b[i]) $B-shs, $(c[i]) $C-shs"])
-                end
                 equations = [
                     join(["$(a[i])·x_$i" for i=iter], " + ") * " = " * join(["$(b[i])·x_$i" for i=iter], " + "),
                     join(["$(c[i])·x_$i" for i=iter], " + ") * " = |$C| = $numMin",
                     join(["x_$i" for i=iter], " + ") * " = s_$vMax = $sMax",
                     "",
-                    definitions...
+                    ["where x_$i is the # of $(posInt[i])-students" for i=iter]...
                 ]
 
                 # Test all possible non-negative integer solutions with system
-                solution = []
-                for x in combo(sMax, length(iter))
-                    if sum(x.*a) == sum(x.*b) && sum(x.*c) == numMin
-                        solution = [
-                            "One solution is " * join(["x_$i = $(x[i])" for i=iter], ", "),
-                            "The system has a non-negative integer solution, so Case 5 is still possible, VMid failed"
-                        ]
-                        break
-                    end
-                end
-                if length(solution) == 0
+                model = Model(Cbc.Optimizer)
+                set_optimizer_attribute(model, "logLevel", 0)
+                set_optimizer_attribute(model, "cuts", "off")
+
+                @variable(model, 0 <= x[i=1:length(iter)], Int)
+
+                @constraint(model, sum(x.*a) == sum(x.*b))
+                @constraint(model, sum(x.*c) == numMin)
+                @constraint(model, sum(x) == sMax)
+                
+                @objective(model, Max, x[1])
+                optimize!(model)
+                if termination_status(model) == MOI.OPTIMAL
+                    x = convert.(Int64, round.(value.(x)))
+                    solution = [
+                        "One solution is " * join(["x_$i = $(x[i])" for i=iter], ", "),
+                        "The system has a non-negative integer solution, so Case 5 is still possible"
+                    ]
+                else
                     solution = ["The system has no non-negative integer solutions, so Case 5 is impossible"]
                 end
 
