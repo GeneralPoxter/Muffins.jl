@@ -63,7 +63,6 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
         procedures = unique(procedures)
     catch
-        # TODO -- implement error reporting
         Nothing
     end
 

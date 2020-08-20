@@ -20,6 +20,9 @@ using .HBM
 include("Gap.jl")
 using .Gap
 
+include("FindProc.jl")
+using .FindProc
+
 # Make sure test.txt is in the same folder as test.jl
 lines = open("test.txt") do file
     readlines(file)
@@ -83,10 +86,10 @@ for case in lines
         
         if res != 0
             tested += 1
-            if res != num//den
-                append!(incorrect, [[(m, s), method, res, alpha]])
-            else
+            if res == num//den && findproc(m, s, res, output=0)[2] != Nothing
                 correct += 1
+            else
+                append!(incorrect, [[(m, s), method, res, alpha]])
             end
         else
             append!(skipped, [[(m, s), method]])
@@ -100,8 +103,3 @@ for case in lines
 end
 
 # Customize output here ↴
-for x in incorrect
-    if x[3] != 1
-        println(x)
-    end
-end
