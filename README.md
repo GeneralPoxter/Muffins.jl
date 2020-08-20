@@ -24,7 +24,7 @@ using Muffins
 
 This installs **Muffins.jl** to your local Julia environment.
 
-Including `using Muffins` to the top of any Julia file or in the Julia REPL after installation allows one to call and run any of the below methods.
+Include `using Muffins` at the top of any Julia file or in the Julia REPL after installation to run any of the below methods.
 
 ## Usage
 Let `m` and `s` be positive [`Int64`](https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/#Integers-1)-type variables. Let `α` be a positive [`Rational{Int64}`](https://docs.julialang.org/en/v1/manual/complex-and-rational-numbers/#Rational-Numbers-1)-type variable.
