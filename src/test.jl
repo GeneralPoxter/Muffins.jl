@@ -1,27 +1,5 @@
 # Import package and any files here ↴
-include("FC.jl")
-using .FC
-
-include("Half.jl")
-using .Half
-
-include("Int.jl")
-using .Int
-
-include("Mid.jl")
-using .Mid
-
-include("EBM.jl")
-using .EBM
-
-include("HBM.jl")
-using .HBM
-
-include("Gap.jl")
-using .Gap
-
-include("FindProc.jl")
-using .FindProc
+include("Muffins.jl")
 
 # Make sure test.txt is in the same folder as test.jl
 lines = open("test.txt") do file
@@ -48,47 +26,39 @@ for case in lines
     num = parse(Int64, alphaF[1])
     den = parse(Int64, alphaF[2])
 
-    tested = 0
-    correct = 0
     for method in split(methods, ",")
-        # For each method you want to test below:
-        # Uncomment "# res = METHOD(m, s)" and replace METHOD with the proper function name
-
         res = 0
 
         if method == "FC"
-            res = fc(m, s, output=0)
+            res = Muffins.fc(m, s, output = 0)
         end
 
         if method == "HALF"
-            res = half(m, s, output=0)
+            res = Muffins.half(m, s, output = 0)
         end
 
         if method == "INT"
-            res = int(m, s, output=0)
+            res = Muffins.int(m, s, output = 0)
         end
 
         if method == "MID"
-            res = mid(m, s, output=0)
+            res = Muffins.mid(m, s, output = 0)
         end
 
         if startswith(method, "EBM")
-            res = ebm(m, s, output=0)
+            res = Muffins.ebm(m, s, output = 0)
         end
 
         if startswith(method, "HBM")
-            res = hbm(m, s, output=0)
+            res = Muffins.hbm(m, s, output = 0)
         end
 
         if method == "GAP"
-            res = gap(m, s, output=0)
+            res = Muffins.gap(m, s, output = 0)
         end
-        
+
         if res != 0
-            tested += 1
-            if res == num//den && findproc(m, s, res, output=0)[2] != Nothing
-                correct += 1
-            else
+            if res != num // den
                 append!(incorrect, [[(m, s), method, res, alpha]])
             end
         else
@@ -96,10 +66,18 @@ for case in lines
         end
     end
 
-    if tested != 0 && correct == 0
+    if Muffins.muffins(m, s, output = 0) != num // den
         append!(nosol, [(m, s)])
     end
 
 end
 
 # Customize output here ↴
+for x in nosol
+    println(x)
+end
+for x in incorrect
+    if x[3] != 1
+        println(x)
+    end
+end

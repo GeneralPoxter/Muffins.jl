@@ -53,8 +53,7 @@ Optionally run `Muffins.vmid(m, s, α)` to verify whether the Midpoint Method ca
 Run `Muffins.ebm(m, s)` to apply the Easy Buddy Match on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
 
 #### Hard Buddy Match
-Run `Muffins.hbm(m, s)` to apply the Hard Buddy Match on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
-Optionally run `Muffins.vbhm(m, s, α)` to verify whether the Hard Buddy Match can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean is returned.
+Run `Muffins.hbm(m, s)` to apply the Hard Buddy Match on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
 
 #### Gap Method
 Run `Muffins.gap(m, s)` to apply the Gap Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
