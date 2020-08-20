@@ -361,7 +361,7 @@ function vhbm(a, d, k, X; output::Int64 = 2)
         end
 
         # Determine possible share combinations
-        shares = combs(3, 3) #not sure if this is necessary
+        shares = combs(3, 3)
         workingcomb = []
 
         for (a, b, c) in comboTup(3, 3)
@@ -410,92 +410,113 @@ function vhbm(a, d, k, X; output::Int64 = 2)
 
             elseif len == 2
                 sol = false
+                number = "Two"
                 if (1, 1, 1) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃+y₁₂₃", "y₁₂₃", "y₁₁₃+y₁₂₃", "y₁₁₃+y₁₂₃"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)", "y₁₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₃"
                 elseif (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃", "3y₂₂₂", "y₁₁₃", "y₁₁₃+y₂₂₂"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ = a + d = $(a+d)", "3y₂₂₂ = a + d = $(a+d)", "y₁₁₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₂₂₂ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₂₂₂"
                 end
 
-                if sol
-                    if output > 1
-                        printfT(
-                            "Two-variable equations",
-                            "We look for a 2d solution in following set of equations:",
-                            "",
-                            "Equation 1 based on |J₁|+ |J₂| = a+d → $eq1 = a+d = $(a+d),  $eq2 = a+d = $(a+d)",
-                            "",
-                            "Equation 2 based on |J₃| = 4d-2a → $eq3 = 4d-2a = $(4*d-2*a)",
-                            "",
-                            "Equation 3 based on s₃ = 2d → $eq4= 2d = $(2*d)",
-                            "",
-                            "Since y₁₁₃ has a solution from {0...$(2*d)}, VHBM verifies alpha",
-                        )
-                    end
-                    return true #verified for 2 variable solutions
-                else
-                    if output > 1
-                        printf("No 2d solution found with derived 2-variable share combinations, vhbm failed.")
-                    end
-                    return false
-                end
             elseif len == 3
+                sol=false
+                number = "Three"
                 if (1, 1, 1) in workingcomb && (1, 0, 2) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃+y₁₂₃", "y₁₂₃", "y₁₁₃+y₁₂₃", "y₁₁₃+y₁₂₃"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)", "y₁₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₁₃₃ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₃, y₁₃₃"
                 elseif (1, 1, 1) in workingcomb && (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃", "3y₂₂₂", "y₁₁₃", "y₁₁₃+y₂₂₂"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)", "y₁₂₃ + 3y₂₂₂ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₂₂₂ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₃, y₂₂₂"
                 elseif (1, 2, 0) in workingcomb && (0, 3, 0) in workingcomb
                     sol = true
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₂ = a + d = $(a+d)", "2y₁₂₂ + 3y₂₂₂ = a + d = $(a+d)", "y₁₁₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₂ + y₂₂₂ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₂, y₂₂₂"
                 elseif (1, 1, 1) in workingcomb && (0, 2, 1) in workingcomb
                     sol = true
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)", "y₁₂₃ + y₂₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₂₂₃ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₃, y₂₂₃"
                 end
 
-                if sol
-                    return true
-                else
-                    return false
-                end
             elseif len == 4
+                sol=false
+                number = "Four"
                 if (2, 1, 0) in workingcomb &&
                    (1, 2, 0) in workingcomb &&
-                   (0, 3, 0) in workincomb
+                   (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃+y₁₂₃", "y₁₂₃", "y₁₁₃+y₁₂₃", "y₁₁₃+y₁₂₃"
-                elseif (1, 2, 0) in workingcomb &&
-                       (1, 1, 1) in workingcomb &&
-                       (0, 3, 0) in workincomb
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + 2y₁₁₂ + y₁₂₂ = a + d = $(a+d)", "3y₂₂₂ = a + d = $(a+d)", "no |J₃| equation", "y₁₁₃ + y₁₁₂ + y₁₂₂ y₂₂₂ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₁₂, y₁₂₂, y₂₂₂"
+                elseif (1, 1, 1) in workingcomb &&
+                       (1, 2, 0) in workingcomb &&
+                       (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃", "3y₂₂₂", "y₁₁₃", "y₁₁₃+y₂₂₂"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₂₂ = a + d = $(a+d)", "3y₂₂₂ + 2y₁₂₂ + y₁₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₁₂₂ + y₂₂₂ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₃, y₁₂₂, y₂₂₂"
                 elseif (1, 1, 1) in workingcomb &&
                        (1, 0, 2) in workingcomb &&
-                       (0, 3, 0) in workincomb
+                       (0, 3, 0) in workingcomb
                     sol = true
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)", "3y₂₂₂ + y₁₂₃ = a + d = $(a+d)", "2y₁₃₃ + y₁₂₃= 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₁₃₃ + y₂₂₂ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₃, y₁₃₃, y₂₂₂"
                 elseif (1, 1, 1) in workingcomb &&
                        (1, 0, 2) in workingcomb &&
                        (0, 2, 1) in workingcomb
                     sol = true
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)", "y₁₂₃ + 2y₂₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ + 2y₁₃₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₁₃₃ + y₂₂₃ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₃, y₁₃₃, y₂₂₃"
                 elseif (1, 1, 1) in workingcomb &&
                        (0, 3, 0) in workingcomb &&
                        (0, 2, 1) in workingcomb
                     sol = true
-                end
-
-                if sol
-                    return true
-                else
-                    return false
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)", "3y₂₂₂ + y₁₂₃ + 2y₂₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₂₂₂ + y₂₂₃ = 2d = $(2*d)"
+                    variables = "y₁₁₃, y₁₂₃, y₂₂₂, y₂₂₃"
                 end
             else
-                return false #to be completed
+                printfT("Equations", "The system of equations formed by student combiations was unsolvable. VHBM failed.")
+                printEnd()
+                return false
             end
 
 
         else
             if output > 1
                 printf("There are no possible share combinations, vhbm failed")
+            end
+            return false
+        end
+
+        #conclusion
+        if sol && len!=1
+            if output > 1
+                printfT(
+                    "$number-variable equations",
+                    "We look for a 2d solution in following set of equations:",
+                    "",
+                    "Equation 1 based on |J₁|+ |J₂| = a+d → ",
+                    "",
+                    "$eq1,  $eq2",
+                    "",
+                    "Equation 2 based on |J₃| = 4d-2a → ",
+                    "",
+                    "$eq3",
+                    "",
+                    "Equation 3 based on s₃ = 2d → ",
+                    "",
+                    "$eq4",
+                    "",
+                    "Since $variables has a solution from {0...$(2*d)}, VHBM verifies alpha",
+                )
+            end
+            return true #verified for 2 variable solutions
+        else
+            if output > 1
+                printf("No 2d solution found with derived 2-variable share combinations, vhbm failed.")
+                printEnd()
             end
             return false
         end
@@ -581,7 +602,7 @@ function Xsol(a, d, k)
             end
         end
 
-        if a < d // 2 || a > (7 * d) // 5 #11.5.11: y₁₃₃, y₁₁₃, y₁₂₃, y₂₂₃ permitted, all others forb
+        if a > d || a < d // 3 #11.5.11: y₁₃₃, y₁₁₃, y₁₂₃, y₂₂₃ permitted, all others forb
             X = max((2 * a - d) // 3, (a + 2 * d) // 8) #corollarly 11.17
             if COND(a, d, X)
                 append!(Xsolutions, X)
