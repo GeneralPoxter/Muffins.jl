@@ -73,11 +73,3 @@ for case in lines
 end
 
 # Customize output here ↴
-for x in nosol
-    println(x)
-end
-for x in incorrect
-    if x[3] != 1
-        println(x)
-    end
-end
