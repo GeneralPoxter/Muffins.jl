@@ -24,15 +24,14 @@ using .Gap
 include("FindProc.jl")
 using .FindProc
 
-#include("Matrix.jl")
-#using .Matrix
+include("Matrix.jl")
+using .Matrix
 
 export muffins
 
 # Solves muffin problem for m muffins and s students -- Work in progress
 # Authors: Antara Hebbar and Jason Liu
 function muffins(m::Int64, s::Int64; output::Int64=1)
-    # TODO -- add case where m < s
     alphas = [  fc(m, s, output=0),
                 half(m, s, output=0),
                 int(m, s, output=0),

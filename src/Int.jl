@@ -14,11 +14,18 @@ function int(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("INTERVAL METHOD"))
     
     if m < s
-        if output > 0
-            printf("Interval Method does not apply", line=true)
+        alpha = m//s*int(s, m, output=0)
+        if output > 1
+            printfT("Duality Theorem",
+                    "muffins($m,$s) = $m/$s · muffins($s,$m)",
+                    "Bounding muffins($s,$m) instead")
+            int(s, m, output=output)
+        elseif output > 0
+            printfT("Interval Method",
+                    "Upper bound α of muffins($m,$s) is $(formatFrac(alpha))")
             printEnd()
         end
-        return 1
+        return alpha
     elseif m % s == 0
         if output > 0
             printfT("Interval Method",

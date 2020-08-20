@@ -21,7 +21,7 @@ using Muffins
 ```
 
 ## Usage
-Let `m` and `s` be positive `Int64`-type variables. Let `α` be a positive `Rational{Int64}`-type variable.
+Let `m` and `s` be positive [`Int64`](https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/#Integers-1)-type variables. Let `α` be a positive [`Rational{Int64}`](https://docs.julialang.org/en/v1/manual/complex-and-rational-numbers/#Rational-Numbers-1)-type variable.
 
 ### General Solution
 Run `Muffins.muffins(m, s)`* to solve the Muffin Problem for `m` muffins and `s` students.  
@@ -43,13 +43,22 @@ Optionally run `Muffins.vint(m, s, α)`* to verify whether the Interval Method c
 Run `Muffins.mid(m, s)`* to apply the Midpoint Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
 Optionally run `Muffins.vmid(m, s, α)`* to verify whether the Midpoint Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
 
-<!--- More method documentation to come -->
+#### Easy Buddy Match
+Run `Muffins.ebm(m, s)`* to apply the Easy Buddy Match on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
+
+#### Hard Buddy Match
+Run `Muffins.hbm(m, s)`* to apply the Hard Buddy Match on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
+Optionally run `Muffins.vbhm(m, s, α)`* to verify whether the Hard Buddy Match can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
+
+#### Gap Method
+Run `Muffins.gap(m, s)`* to apply the Gap Method on `(m, s)` to find an upper boudn `α` for `muffins(m, s)`. `α` is returned.
+Optionally run `Muffins.vgap(m, s, α)`* to verify whether the Gap Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
 
 ### FindProc
 Run `Muffins.findproc(m, s, α)`* to display potential procedures/solutions for dividing `m` muffins among `s` students where `α` is the smallest muffin piece cut. A solutions array is returned.
 
 ### Matrix Solve
-Run `Muffins.solve(m, s)` to apply linear algebra to find `muffins(m, s)`. The solution is returned. This is a work in progress in terms of speed and accuracy.
+Run `Muffins.solve(m, s)` to apply linear algebra to find `muffins(m, s)`. The solution is returned. This is a work in progress in terms of speed and accuracy and should only be treated as a novelty.
 
 ### Output mode
 A an asterisk (*) is placed next to methods which have an optional `output` argument, which can be set to an integer that determines how much text the method displays:

@@ -9,7 +9,7 @@ using .Format
 include("FC.jl")
 using .FC
 
-export hbm, VHBM
+export hbm, vhbm
 
 # Determines an upper bound using Hard-Buddy Match method
 # Author: Antara Hebbar
@@ -62,7 +62,7 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
                     alpha=(d*k+X)//(3*d*k+a)
                 end
 
-                if VHBM(a,d,k,X, output=output)
+                if vhbm(a,d,k,X, output=output)
                     if output>0
                         printfT("Deriving alpha", "The derived value for X is $X. f($m, $s) ≤ (dk+X)/(3dk+a).", "",
                         "Once plugging in d, k, a, and X to HBM algorithm, upper bound $alpha is derived.")
@@ -90,7 +90,7 @@ end
 
 
 #Verifies that with an input of a,d,k,X, f(3dk+a+d, 3dk+a) ≤ (dk+X)/(3dk+a), ouputs proof if wanted
-function VHBM(a,d,k,X; output::Int64=2)
+function vhbm(a,d,k,X; output::Int64=2)
     #pre-processing stage: checks for a bad input
     pre=true
     alpha=(d*k+X)//(3*d*k+a)

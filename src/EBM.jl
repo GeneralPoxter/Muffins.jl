@@ -9,7 +9,7 @@ using .Format
 include("FC.jl")
 using .FC
 
-export ebm, ebmproof
+export ebm
 
 # Determines upper boudn alpha with Easy Buddy Match, optionally outputs proof
 # Author: Antara Hebbar
@@ -21,7 +21,7 @@ function ebm(m::Int64, s::Int64; output::Int64=2)
             printf("Easy Buddy Match does not apply", line=true)
             printEnd()
         end
-        return Nothing
+        return 1
     elseif m % s == 0
         if output > 0
             printfT("Easy Buddy Match",

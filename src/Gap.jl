@@ -23,11 +23,18 @@ function gap(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("GAP METHOD"))
 
     if m < s
-        if output > 0
-            printf("Gap Method does not apply", line=true)
+        alpha = m//s*gap(s, m, output=0)
+        if output > 1
+            printfT("Duality Theorem",
+                    "muffins($m,$s) = $m/$s · muffins($s,$m)",
+                    "Bounding muffins($s,$m) instead")
+            gap(s, m, output=output)
+        elseif output > 0
+            printfT("Gap Method",
+                    "Upper bound α of muffins($m,$s) is $(formatFrac(alpha))")
             printEnd()
         end
-        return 1
+        return alpha
     elseif m % s == 0
         if output > 0
             printfT("Gap Method",
@@ -449,7 +456,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                                     if disjoint
                                         append!(ints, [[lower, upper]])
                                     end
-                                    append!(equations, ["For $tup-student: all $vMax-shs in interval $(upChr[i]) must lie in [$(formatFrac(lower, cd)), $(formatFrac(upper, cd))]"])
+                                    append!(equations, ["For $tup-student: all $vMax-shs in interval $(upChr[i]) must lie in ($(formatFrac(lower, cd)), $(formatFrac(upper, cd)))"])
                                 end
                             end
                             sort!(ints)
@@ -533,8 +540,8 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
                     # Update labels and intervalDefs
                     labels = repeat(["0"], length(intervals) - 1)
-                    intervalDefs = []
-                    buddies = []
+                    intervalDefs = repeat([""], length(bounds))
+                    equivs = []
                     solidInt = 0
                     visited = []
                     iter = 1:length(intervals)-1
@@ -547,29 +554,32 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                                     (lower, upper) = (intervals[k][2], intervals[k+1][2])
                                     if int == solid
                                         labels[k] = "$numMin $vMax-shs"
-                                        append!(intervalDefs, ["$chr = ($lower, $upper) (|$chr| = $numMin)"])
+                                        intervalDefs[i] = "$chr = ($lower, $upper) (|$chr| = $numMin)"
                                         solidInt = i
                                     else
-                                        (chr1, chr2) = (loChr[loOrd], chr)
-                                        labels[k] = "$chr1 $vMax-shs"
-                                        append!(intervalDefs, ["$chr2 = ($lower, $upper)"])
+                                        chrL = loChr[loOrd]
+                                        labels[k] = "$chrL $vMax-shs"
+                                        intervalDefs[i] = "$chr = ($lower, $upper)"
+                                        equiv = [i]
                                         for j=i:length(bounds)
-                                            intBud = bounds[j]
-                                            chr3 = upChr[j]
-                                            if intBud == [1-int[2], 1-int[1]]
+                                            intOth = bounds[j]
+                                            if intOth == [1-int[2], 1-int[1]] || (vMax == 2 && intOth == [m//s-int[2], m//s-int[1]])
                                                 for l=iter
-                                                    if toFrac(intervals[l][2]) == intBud[1] && toFrac(intervals[l+1][2]) == intBud[2]
-                                                        (lowerBud, upperBud) = (intervals[l][2], intervals[l+1][2])
-                                                        labels[l] = "$chr1 $vMax-shs"
-                                                        append!(intervalDefs, ["$chr3 = ($lowerBud, $upperBud) (|$chr2| = |$chr3| = $chr1)"])
-                                                        append!(buddies, [(i, j)])
+                                                    if toFrac(intervals[l][2]) == intOth[1] && toFrac(intervals[l+1][2]) == intOth[2]
+                                                        (lowerOth, upperOth) = (intervals[l][2], intervals[l+1][2])
+                                                        labels[l] = "$chrL $vMax-shs"
+                                                        intervalDefs[j] = "$(upChr[j]) = ($lowerOth, $upperOth)"
+                                                        append!(equivs, [(i, j)])
+                                                        append!(equiv, j)
                                                         append!(visited, j)
                                                     end
                                                 end
                                             end
                                         end
+                                        intervalDefs[equiv[length(equiv)]] *= " ($(join(["|$(upChr[j])|" for j in equiv], " = ")) = $chrL)"
+                                        loOrd += 1
                                     end
-                                    loOrd += 1
+                                    break
                                 end
                             end
                         end
@@ -584,7 +594,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         printLine() 
                         printfT("Note",
                                 "We define the following intervals:",
-                                sort(intervalDefs)...)
+                                intervalDefs...)
                     end
 
                     if length(posInt) > 0
@@ -604,7 +614,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                         l = solidInt
 
                         equations = []
-                        for (j, k) in buddies
+                        for (j, k) in equivs
                             append!(equations, [join(["$(consts[j][i])·x_$i" for i=iter], " + ") * " = " * join(["$(consts[k][i])·x_$i" for i=iter], " + ")])
                         end
                         if l > 0
@@ -621,10 +631,10 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
 
                         @variable(model, 0 <= x[i=1:length(iter)], Int)
 
-                        for (j, k) in buddies
+                        for (j, k) in equivs
                             @constraint(model, sum(x.*consts[j]) == sum(x.*consts[k]))
                         end
-                        if l != 0
+                        if l > 0
                             @constraint(model, sum(x.*consts[l]) == numMin)
                         end
                         @constraint(model, sum(x) == sMax)

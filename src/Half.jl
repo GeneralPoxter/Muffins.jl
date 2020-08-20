@@ -14,11 +14,18 @@ function half(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("HALF METHOD"))
 
     if m < s
-        if output > 0
-            printf("Half Method does not apply", line=true)
+        alpha = m//s*half(s, m, output=0)
+        if output > 1
+            printfT("Duality Theorem",
+                    "muffins($m,$s) = $m/$s · muffins($s,$m)",
+                    "Bounding muffins($s,$m) instead")
+            half(s, m, output=output)
+        elseif output > 0
+            printfT("Half Method",
+                    "Upper bound α of muffins($m,$s) is $(formatFrac(alpha))")
             printEnd()
         end
-        return 1
+        return alpha
     elseif m % s == 0
         if output > 0
             printfT("Half Method",
