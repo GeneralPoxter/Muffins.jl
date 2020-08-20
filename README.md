@@ -31,7 +31,7 @@ Including `using Muffins` to the top of any Julia file or in the Julia REPL afte
 
 ### General Solution
 Run `Muffins.muffins(m, s)`* to solve the Muffin Problem for `m` muffins and `s` students.  
-An upper bound `α` for `muffins(m, s)` is determined by testing `(m, s)` on all of the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **FindProc**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`.
+An upper bound `α` for `muffins(m, s)` is determined by testing `(m, s)` on all of the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **Find Procedure**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`.
 
 ### Bounding methods
 #### Floor-Ceiling Theorem
@@ -58,7 +58,7 @@ Optionally run `Muffins.vbhm(m, s, α)`* to verify whether the Hard Buddy Match 
 
 #### Gap Method
 Run `Muffins.gap(m, s)`* to apply the Gap Method on `(m, s)` to find an upper boudn `α` for `muffins(m, s)`. `α` is returned.
-Optionally run `Muffins.vgap(m, s, α)`* to verify whether the Gap Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.
+Optionally run `Muffins.vgap(m, s, α)`* to verify whether the Gap Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean value is returned.  
 This version of the Gap Method does not include buddy-matching (GAPBM), which may result in inconclusive results for some `(m, s)`.
 
 ### Find Procedure
