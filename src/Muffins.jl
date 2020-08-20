@@ -70,7 +70,7 @@ function muffins(m::Int64, s::Int64; output::Int64=1)
     procedures = findproc(m, s, alpha, output=0)[2]
     if procedures == Nothing
         disp && println("\nFindProc could not confirm optimal α to be a lower bound\nmuffins($m,$s) failed")
-        return 1
+        return 1//1
     end
 
     #findproc(m, s, alpha, output=output)

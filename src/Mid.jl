@@ -16,7 +16,13 @@ export mid, vmid
 function mid(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("MIDPOINT METHOD"))
 
-    if m < s
+    if m <= 0 || s <= 0
+        if output > 0
+            printf("Midpoint Method does not apply", line=true)
+            printEnd()
+        end
+        return 1//1
+    elseif m < s
         alpha = m//s*mid(s, m, output=0)
         if output > 1
             printfT("Duality Theorem",
@@ -35,7 +41,7 @@ function mid(m::Int64, s::Int64; output::Int64=2)
                     "Since $m % $s = 0, muffins($m,$s) = 1")
             printEnd()
         end
-        return 1
+        return 1//1
     end
 
     (V, W, sV, sW) = sv(m, s)
@@ -68,7 +74,7 @@ function mid(m::Int64, s::Int64; output::Int64=2)
         printf("All α candidates were inconclusive, Midpoint Method inconclusive", line=true)
         printEnd()
     end
-    1
+    1//1
 end
 
 # Helper function for mid -- verifies whether mid(m, s, alpha) is conclusive

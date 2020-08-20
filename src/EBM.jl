@@ -16,19 +16,19 @@ export ebm
 function ebm(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("EASY BUDDY MATCH"))
 
-    if m < s
+    if !(m > s > 0)
         if output > 0
             printf("Easy Buddy Match does not apply", line=true)
             printEnd()
         end
-        return 1
+        return 1//1
     elseif m % s == 0
         if output > 0
             printfT("Easy Buddy Match",
                     "Since $m % $s = 0, muffins($m,$s) = 1")
             printEnd()
         end
-        return 1
+        return 1//1
     end
 
     (V, W, sV, sW) = sv(m, s)

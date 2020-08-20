@@ -13,7 +13,13 @@ export int, vint
 function int(m::Int64, s::Int64; output::Int64=2)
     output > 0 && printHeader(center("INTERVAL METHOD"))
     
-    if m < s
+    if m <= 0 || s <= 0
+        if output > 0
+            printf("Interval Method does not apply", line=true)
+            printEnd()
+        end
+        return 1//1
+    elseif m < s
         alpha = m//s*int(s, m, output=0)
         if output > 1
             printfT("Duality Theorem",
@@ -32,7 +38,7 @@ function int(m::Int64, s::Int64; output::Int64=2)
                     "Since $m % $s = 0, muffins($m,$s) = 1")
             printEnd()
         end
-        return 1
+        return 1//1
     end
 
     (V, W, sV, sW) = sv(m, s)
@@ -64,7 +70,7 @@ function int(m::Int64, s::Int64; output::Int64=2)
         printf("Interval Method inconclusive", line=true)
         printEnd()
     end
-    1
+    1//1
 end
 
 # Helper function for int -- verifies whether int(m, s, alpha) is conclusive

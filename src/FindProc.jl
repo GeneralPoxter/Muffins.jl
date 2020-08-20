@@ -18,6 +18,9 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     c = numerator(alpha)
     d = denominator(alpha)
     b = lcm(s, d)
+    if m % s == 0 && alpha == 1
+        b = 1
+    end
 
     a = Int64(b * c / d)
     global B = [x for x in a:(b-a)]
@@ -25,6 +28,14 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
     M = []
     S = []
     procedures = []
+
+    if m <= 0 || s <= 0
+        if output > 0
+            printf("Find Procedure does not apply", line=true)
+            printEnd()
+        end
+        return [b, Nothing]
+    end
 
     try
         # Determine vector sets
@@ -74,6 +85,15 @@ function findproc(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64=2)
                 "Find procedures for dividing $m muffins among $s students where $alpha is the smallest piece size",
                 "",
                 "Let the common denominator be $b")
+    end
+
+    # Exit on edge case
+    if m % s == 0 && toFrac(alpha) == 1
+        give = repeat([1], Int64(m/s))
+        printfT("Procedure",
+                "Divide $m muffins {1}",
+                "Give $s students {$(join(give, ","))}")
+        return [b, [[[[m, [1]]], [[s, give]]]]]
     end
 
     # Exit if no procedures

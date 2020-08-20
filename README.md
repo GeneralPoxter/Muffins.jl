@@ -31,7 +31,7 @@ Including `using Muffins` to the top of any Julia file or in the Julia REPL afte
 
 ### General Solution
 Run `Muffins.muffins(m, s)` to solve the Muffin Problem for `m` muffins and `s` students.  
-An upper bound `α` for `muffins(m, s)` is found by testing `(m, s)` on all the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **Find Procedure**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`. Else, the method returns `1`.
+An upper bound `α` for `muffins(m, s)` is found by testing `(m, s)` on all the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **Find Procedure**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`. Else, the method returns `1//1`.
 
 ### Bounding methods
 #### Floor-Ceiling Theorem

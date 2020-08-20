@@ -14,20 +14,20 @@ export hbm, vhbm
 # Determines an upper bound using Hard-Buddy Match method
 # Author: Antara Hebbar
 function hbm(m::Int64, s::Int64; output::Int64=2)
-    output>0&&printHeader(center("HARD-BUDDY MATCH METHOD"))
+    output > 0 && printHeader(center("HARD BUDDY MATCH"))
 
-    if m<s|| m<=0 || s<=0
+    if !(m > s > 0)
         if output > 0
-            printf("HBM method does not apply", line=true)
+            printf("Hard Buddy Match does not apply", line=true)
             printEnd()
         end
-        return 1
+        return 1//1
     elseif m%s == 0
         if output > 0
             printf("Since $m % $s = 0, f($m, $s) = 1.", line=true)
             printEnd()
         end
-        return 1
+        return 1//1
     else
         V = Int64(ceil(2m/s))
         if V==3
@@ -42,7 +42,7 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
             Xsolutions = Xsol(a,d,k)
 
             if length(Xsolutions)==0
-                return 1
+                return 1//1
             elseif a==(2*d)
                 alpha = fc(m,s, output=0)
                 if output>0
@@ -74,7 +74,7 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
                         printf("VHBM does not verify the alpha derived by Hard-Buddy Match.", line=true)
                         printEnd()
                     end
-                return 1
+                return 1//1
                 end
             end
         else
@@ -83,7 +83,7 @@ function hbm(m::Int64, s::Int64; output::Int64=2)
                 Since in f($m, $s), students are given $V and $(V-1) shares, HBM does not apply here.", line=true)
                 printEnd()
             end
-            return 1
+            return 1//1
         end
     end
 end
