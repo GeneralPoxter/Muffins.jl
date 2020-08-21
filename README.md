@@ -41,67 +41,67 @@ Given `(m, s)`, each bounding method finds and returns the upper bound `α` for 
 
 Most bounding methods also have a v-method that returns a boolean, verifying whether that bounding method can prove that the given `α` is an upper bound for `muffins(m, s)`.
 
-#### Floor-Ceiling Theorem
-To find upper bound `α`:
-```julia
-Muffins.fc(m, s)
-```
-No v-method
++ #### Floor-Ceiling Theorem
+    To find upper bound `α`:
+    ```julia
+    Muffins.fc(m, s)
+    ```
+    No v-method
 
-#### Half Method
-To find upper bound `α`:
-```julia
-Muffins.half(m, s)
-```
-To verify `α`:
-```julia
-Muffins.vhalf(m, s, α)
-```
++ #### Half Method
+    To find upper bound `α`:
+    ```julia
+    Muffins.half(m, s)
+    ```
+    To verify `α`:
+    ```julia
+    Muffins.vhalf(m, s, α)
+    ```
 
-#### Interval Method
-To find upper bound `α`:
-```julia
-Muffins.int(m, s)
-```
-To verify `α`:
-```julia
-Muffins.vint(m, s, α)
-```
++ #### Interval Method
+    To find upper bound `α`:
+    ```julia
+    Muffins.int(m, s)
+    ```
+    To verify `α`:
+    ```julia
+    Muffins.vint(m, s, α)
+    ```
 
-#### Midpoint Method
-To find upper bound `α`:
-```julia
-Muffins.mid(m, s)
-```
-To verify `α`:
-```julia
-Muffins.vmid(m, s, α)
-```
++ #### Midpoint Method
+    To find upper bound `α`:
+    ```julia
+    Muffins.mid(m, s)
+    ```
+    To verify `α`:
+    ```julia
+    Muffins.vmid(m, s, α)
+    ```
 
-#### Easy Buddy Match
-To find upper bound `α`:
-```julia
-Muffins.ebm(m, s)
-```
-No v-method
++ #### Easy Buddy Match
+    To find upper bound `α`:
+    ```julia
+    Muffins.ebm(m, s)
+    ```
+    No v-method
 
-#### Hard Buddy Match
-To find upper bound `α`:
-```julia
-Muffins.hbm(m, s)
-```
-No v-method
++ #### Hard Buddy Match
+    To find upper bound `α`:
+    ```julia
+    Muffins.hbm(m, s)
+    ```
+    No v-method
 
-#### Gap Method
-To find upper bound `α`:
-```julia
-Muffins.gap(m, s)
-```
-To verify `α`:
-```julia
-Muffins.vgap(m, s, α)
-```
-This version of the Gap Method does not include buddy-matching (GAPBM), which may result in inconclusive results for some `(m, s)`.
++ #### Gap Method
+    To find upper bound `α`:
+    ```julia
+    Muffins.gap(m, s)
+    ```
+    To verify `α`:
+    ```julia
+    Muffins.vgap(m, s, α)
+    ```
+    This version of the Gap Method does not include buddy-matching (GAPBM), which may be inconclusive for some `(m, s)`.
 
 ### Find Procedure
 To find potential procedures/solutions for dividing `m` muffins among `s` students where `α` is the smallest muffin piece cut:
