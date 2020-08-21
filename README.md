@@ -101,7 +101,7 @@ Most bounding methods also have a v-method that returns a boolean, verifying whe
     ```julia
     Muffins.vgap(m, s, α)
     ```
-    This version of the Gap Method does not include buddy-matching (GAPBM), which may be inconclusive for some `(m, s)`.
+    This version of the Gap Method does not implement buddy-matching, which may be inconclusive for some `(m, s)`.
 
 ### Find Procedure
 To find potential procedures/solutions for dividing `m` muffins among `s` students where `α` is the smallest muffin piece cut:
