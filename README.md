@@ -77,7 +77,7 @@ For example, `Muffins.half(m, s, output=1)` will display the results of the Half
 By default, `output` is set to `1` for `Muffins.muffins(m, s)` and `2` for other asterisk methods.
 
 ## Accuracy
-Except for **Matrix Solve** and the cases listed [here](https://docs.google.com/spreadsheets/d/1ruZvlS14-7J_UREqOEvMM_SHVeAgZnEUP0GWayFXHf0/edit?usp=sharing), all **Muffins.jl** methods are correct for all cases not labeled with "GAPBM" listed in [test.txt](src/test.txt).  
+Except for **Matrix Solve** and the cases listed [here](https://docs.google.com/spreadsheets/d/1ruZvlS14-7J_UREqOEvMM_SHVeAgZnEUP0GWayFXHf0/edit?usp=sharing), all **Muffins.jl** methods are correct for all cases listed in [test.txt](src/test.txt).  
 The user is free to test **Muffins.jl** by customizing and running [test.jl](src/test.jl) (this would require accessing and modifying files in the package).
 
 ## Development
