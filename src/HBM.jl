@@ -413,71 +413,107 @@ function vhbm(a, d, k, X; output::Int64 = 2)
                 number = "Two"
                 if (1, 1, 1) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)", "y₁₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)",
+                    "y₁₂₃ = a + d = $(a+d)",
+                    "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₃ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₃"
                 elseif (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ = a + d = $(a+d)", "3y₂₂₂ = a + d = $(a+d)", "y₁₁₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₂₂₂ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ = a + d = $(a+d)",
+                    "3y₂₂₂ = a + d = $(a+d)",
+                    "y₁₁₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₂₂₂ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₂₂₂"
                 end
 
             elseif len == 3
-                sol=false
+                sol = false
                 number = "Three"
                 if (1, 1, 1) in workingcomb && (1, 0, 2) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)", "y₁₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₁₃₃ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)",
+                    "y₁₂₃ = a + d = $(a+d)",
+                    "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₃ + y₁₃₃ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₃, y₁₃₃"
                 elseif (1, 1, 1) in workingcomb && (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)", "y₁₂₃ + 3y₂₂₂ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₂₂₂ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)",
+                    "y₁₂₃ + 3y₂₂₂ = a + d = $(a+d)",
+                    "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₃ + y₂₂₂ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₃, y₂₂₂"
                 elseif (1, 2, 0) in workingcomb && (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₂ = a + d = $(a+d)", "2y₁₂₂ + 3y₂₂₂ = a + d = $(a+d)", "y₁₁₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₂ + y₂₂₂ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₂ = a + d = $(a+d)",
+                    "2y₁₂₂ + 3y₂₂₂ = a + d = $(a+d)",
+                    "y₁₁₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₂ + y₂₂₂ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₂, y₂₂₂"
                 elseif (1, 1, 1) in workingcomb && (0, 2, 1) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)", "y₁₂₃ + y₂₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₂₂₃ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)",
+                    "y₁₂₃ + y₂₂₃ = a + d = $(a+d)",
+                    "y₁₁₃ + y₁₂₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₃ + y₂₂₃ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₃, y₂₂₃"
                 end
 
             elseif len == 4
-                sol=false
+                sol = false
                 number = "Four"
                 if (2, 1, 0) in workingcomb &&
                    (1, 2, 0) in workingcomb &&
                    (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + 2y₁₁₂ + y₁₂₂ = a + d = $(a+d)", "3y₂₂₂ = a + d = $(a+d)", "no |J₃| equation", "y₁₁₃ + y₁₁₂ + y₁₂₂ y₂₂₂ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + 2y₁₁₂ + y₁₂₂ = a + d = $(a+d)",
+                    "3y₂₂₂ = a + d = $(a+d)",
+                    "no |J₃| equation",
+                    "y₁₁₃ + y₁₁₂ + y₁₂₂ y₂₂₂ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₁₂, y₁₂₂, y₂₂₂"
                 elseif (1, 1, 1) in workingcomb &&
                        (1, 2, 0) in workingcomb &&
                        (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₂₂ = a + d = $(a+d)", "3y₂₂₂ + 2y₁₂₂ + y₁₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₁₂₂ + y₂₂₂ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₂₂ = a + d = $(a+d)",
+                    "3y₂₂₂ + 2y₁₂₂ + y₁₂₃ = a + d = $(a+d)",
+                    "y₁₁₃ + y₁₂₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₃ + y₁₂₂ + y₂₂₂ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₃, y₁₂₂, y₂₂₂"
                 elseif (1, 1, 1) in workingcomb &&
                        (1, 0, 2) in workingcomb &&
                        (0, 3, 0) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)", "3y₂₂₂ + y₁₂₃ = a + d = $(a+d)", "2y₁₃₃ + y₁₂₃= 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₁₃₃ + y₂₂₂ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)",
+                    "3y₂₂₂ + y₁₂₃ = a + d = $(a+d)",
+                    "2y₁₃₃ + y₁₂₃= 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₃ + y₁₃₃ + y₂₂₂ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₃, y₁₃₃, y₂₂₂"
                 elseif (1, 1, 1) in workingcomb &&
                        (1, 0, 2) in workingcomb &&
                        (0, 2, 1) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)", "y₁₂₃ + 2y₂₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ + 2y₁₃₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₁₃₃ + y₂₂₃ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ + y₁₃₃ = a + d = $(a+d)",
+                    "y₁₂₃ + 2y₂₂₃ = a + d = $(a+d)",
+                    "y₁₁₃ + y₁₂₃ + 2y₁₃₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₃ + y₁₃₃ + y₂₂₃ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₃, y₁₃₃, y₂₂₃"
                 elseif (1, 1, 1) in workingcomb &&
                        (0, 3, 0) in workingcomb &&
                        (0, 2, 1) in workingcomb
                     sol = true
-                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)", "3y₂₂₂ + y₁₂₃ + 2y₂₂₃ = a + d = $(a+d)", "y₁₁₃ + y₁₂₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)", "y₁₁₃ + y₁₂₃ + y₂₂₂ + y₂₂₃ = 2d = $(2*d)"
+                    eq1, eq2, eq3, eq4 = "2y₁₁₃ + y₁₂₃ = a + d = $(a+d)",
+                    "3y₂₂₂ + y₁₂₃ + 2y₂₂₃ = a + d = $(a+d)",
+                    "y₁₁₃ + y₁₂₃ + y₂₂₃ = 4d - 2a = $(4*d-2*a)",
+                    "y₁₁₃ + y₁₂₃ + y₂₂₂ + y₂₂₃ = 2d = $(2*d)"
                     variables = "y₁₁₃, y₁₂₃, y₂₂₂, y₂₂₃"
                 end
             else
-                printfT("Equations", "The system of equations formed by student combiations was unsolvable. VHBM failed.")
+                printfT(
+                    "Equations",
+                    "The system of equations formed by student combiations was unsolvable. VHBM failed.",
+                )
                 printEnd()
                 return false
             end
@@ -491,7 +527,7 @@ function vhbm(a, d, k, X; output::Int64 = 2)
         end
 
         #conclusion
-        if sol && len!=1
+        if sol && len != 1
             if output > 1
                 printfT(
                     "$number-variable equations",

@@ -9,7 +9,7 @@ end
 # Array of failed cases: [(muffins, students), method, generated answer, actual answer]
 incorrect = []
 
-# Array of cases with no solutions over all methods: (muffins, students)
+# Array of cases with no solutions over all methods: [(muffins, students), methods]
 nosol = []
 
 # Array of skipped cases: [(muffins, students), method]
@@ -23,8 +23,7 @@ for case in lines
     s = parse(Int64, s)
 
     alphaF = split(alpha, "/")
-    num = parse(Int64, alphaF[1])
-    den = parse(Int64, alphaF[2])
+    alpha = parse(Int64, alphaF[1]) // parse(Int64, alphaF[2])
 
     for method in split(methods, ",")
         res = 0
@@ -58,7 +57,7 @@ for case in lines
         end
 
         if res != 0
-            if res != num // den
+            if res != alpha
                 append!(incorrect, [[(m, s), method, res, alpha]])
             end
         else
@@ -66,8 +65,8 @@ for case in lines
         end
     end
 
-    if Muffins.muffins(m, s, output = 0) != num // den
-        append!(nosol, [(m, s)])
+    if Muffins.muffins(m, s, output = 0) != alpha
+        append!(nosol, [[(m, s), methods]])
     end
 
 end
