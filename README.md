@@ -34,37 +34,47 @@ Run `Muffins.muffins(m, s)` to solve the Muffin Problem for `m` muffins and `s` 
 An upper bound `α` for `muffins(m, s)` is found by testing `(m, s)` on all the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **Find Procedure**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`. Else, the method returns `1//1`.
 
 ### Bounding methods
+Given `(m, s)`, the following methods find and return the upper bound `α` for `muffins(m, s)` using their respective bounding method.  
+Most bounding methods have a v-method that returns a boolean, verifying whether that method can prove that the given `α` is an upper bound for `muffins(m, s)`.
+
 #### Floor-Ceiling Theorem
-Run `Muffins.fc(m, s)` to apply the Floor-Ceiling Theorem on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
+Run `Muffins.fc(m, s)`  
+No v-method
 
 #### Half Method
-Run `Muffins.half(m, s)` to apply the Half Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
-Optionally run `Muffins.vhalf(m, s, α)` to verify whether the Half Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean is returned.
+Run `Muffins.half(m, s)`  
+To verify, run `Muffins.vhalf(m, s, α)`
 
 #### Interval Method
-Run `Muffins.int(m, s)` to apply the Interval Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
-Optionally run `Muffins.vint(m, s, α)` to verify whether the Interval Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean is returned.
+Run `Muffins.int(m, s)`  
+To verify, run `Muffins.vint(m, s, α)`
 
 #### Midpoint Method
-Run `Muffins.mid(m, s)` to apply the Midpoint Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
-Optionally run `Muffins.vmid(m, s, α)` to verify whether the Midpoint Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean is returned.
+Run `Muffins.mid(m, s)`  
+To verify, run `Muffins.vmid(m, s, α)`
 
 #### Easy Buddy Match
-Run `Muffins.ebm(m, s)` to apply the Easy Buddy Match on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
+Run `Muffins.ebm(m, s)`  
+No v-method
 
 #### Hard Buddy Match
-Run `Muffins.hbm(m, s)` to apply the Hard Buddy Match on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.
+Run `Muffins.hbm(m, s)`  
+No v-method
 
 #### Gap Method
-Run `Muffins.gap(m, s)` to apply the Gap Method on `(m, s)` to find an upper bound `α` for `muffins(m, s)`. `α` is returned.  
-Optionally run `Muffins.vgap(m, s, α)` to verify whether the Gap Method can prove that the given `α` is an upper bound for `muffins(m, s)`. A boolean is returned.  
+Run `Muffins.gap(m, s)`  
+To verify, run `Muffins.vgap(m, s, α)`  
 This version of the Gap Method does not include buddy-matching (GAPBM), which may result in inconclusive results for some `(m, s)`.
 
 ### Find Procedure
-Run `Muffins.findproc(m, s, α)` to display potential procedures/solutions for dividing `m` muffins among `s` students where `α` is the smallest muffin piece cut. A solutions array is returned. This method does not return all possible procedures.
+Run `Muffins.findproc(m, s, α)`:  
+Displays potential procedures/solutions for dividing `m` muffins among `s` students where `α` is the smallest muffin piece cut, and returns a solutions array.  
+This method does not return all possible procedures.
 
 ### Matrix Solve
-Run `Muffins.solve(m, s)` to apply linear algebra and **[Cbc.jl](https://github.com/jump-dev/Cbc.jl)** to find `muffins(m, s)`. The solution is returned. This is a work in progress in terms of speed and accuracy and should only be treated as a novelty.
+Run `Muffins.solve(m, s)`:  
+Applies linear algebra and [Cbc.jl](https://github.com/jump-dev/Cbc.jl) to find `muffins(m, s)`, and returns the solution `α`.  
+This is a work in progress in terms of speed and accuracy and should only be treated as a novelty.
 
 ### Output mode
 All methods except for **Matrix Solve** have an [optional keyword argument](https://docs.julialang.org/en/v1/manual/functions/#Keyword-Arguments-1) `output`, which can be set to an integer that determines how much text the method displays:
