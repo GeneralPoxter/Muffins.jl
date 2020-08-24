@@ -236,7 +236,8 @@ function ebmproof(m, s, alpha)
                     labels = ["$(V)s_$V $V-shs", "0", "$(V-1)s_$(V-1) $(V-1)-shs"],
                 ),
             )
-            printf("The assumption that X ≥ $(a//3) ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
+            bound = formatFrac(a//3)
+            printf("The assumption that X ≥ $bound ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
             printLine()
 
             j = k - 1
@@ -288,7 +289,9 @@ function ebmproof(m, s, alpha)
             if 2 * d + 1 <= a <= 3 * d #where X=a/3
                 printfT(
                     "Case 3e.1",
-                    "Assume by contradiction that X>$a/3. We want the left endpoint of B𝒌₋₁ to be ≤ the right endpoint of the two-shares. Hence:",
+                    "Assume by contradiction that X > $a/3.",
+                    "",
+                    "We want the left endpoint of B𝒌₋₁ to be ≤ the right endpoint of the two-shares. Hence:",
                     "",
                     "($(2*d*k+a - k*d)-X)/$comden ≤ ($(d*k+a+d)-2X)/$comden",
                     "",
@@ -308,7 +311,9 @@ function ebmproof(m, s, alpha)
             elseif 1 <= a <= d #where X=a/2
                 printfT(
                     "Case 3e.2",
-                    "Assume by way of contradiction that X>$a/2. We want the left endpoint of B𝒌₋₁ to be ≤ the right endpoint of the three-shares. Hence:",
+                    "Assume by way of contradiction that X>$a/2.",
+                    "",
+                    "We want the left endpoint of B𝒌₋₁ to be ≤ the right endpoint of the three-shares. Hence:",
                     "",
                     "($(2*d*k+a - k*d)-X)/$comden ≤ ($(d*k)+X)/$comden, which is X= $a/2.",
                     "",
@@ -328,7 +333,9 @@ function ebmproof(m, s, alpha)
             elseif d <= a <= 2 * d - 1 #where X=(a+d)/4 this is unfinished - have not tested yet.
                 printfT(
                     "Case 3e.3",
-                    "Assume by way of contradiction that X>$(a+d)/4 and X≤$a/2. We will use a buddy-match method to find intervals that cover the entire inverval, causing a contradiction.",
+                    "Assume by way of contradiction that X > $(a+d)/4 and X ≤ $a/2.",
+                    "",
+                    "We will use a buddy-match method to find intervals that cover the entire inverval, causing a contradiction.",
                     "",
                     "M₀ = (($(d*k)+X)/$comden, ($(d*k+d)-2X)/$comden))",
                     "B₀ = B(M₀) = (($(2*d*k+a-d)-X)/$comden), ($(2*d*k+a)-X)/$comden)",

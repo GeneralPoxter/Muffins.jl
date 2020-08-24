@@ -222,6 +222,7 @@ function vhbm(a, d, k, X; output::Int64 = 2)
         formatFrac((2 * d * k + X) // comden, den)
         bound1S = formatFrac((d * k + a - X) // comden, den)
         int5 = formatFrac((d * k + a // 2) // comden, den)
+        bound = formatFrac(a//3)
 
 
         if output > 1
@@ -237,7 +238,7 @@ function vhbm(a, d, k, X; output::Int64 = 2)
                     labels = ["$(V)s_$V $V-shs", "0", "$(V-1)s_$(V-1) $(V-1)-shs"],
                 ),
             )
-            printf("The assumption that X ≥ $(a//3) ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
+            printf("The assumption that X ≥ $bound ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
             printLine()
 
 
