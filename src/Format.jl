@@ -70,40 +70,30 @@ function toFrac(frac::String)
     end
 end
 
-# Outpus a string interval that concatenates given ranges labeled with given labels
+# Outputs a string interval that concatenates given ranges labeled with given labels
 function interval(rngs...; labels = repeat([" "], length(rngs) - 1))
-    int = ""
-    val = ""
+    lines = []
     w = maximum(length(rng[2]) for rng in rngs) + 1
-    for i = 1:(2length(rngs)-1)
-        if i % 2 == 0
-            label = labels[Int64(i / 2)]
-            int *= label
-            val *= ' '^length(label)
+    int = center(rngs[1][1], width = w)
+    val = center(rngs[1][2], width = w)
+    for i = 2:length(rngs)
+        label = labels[i-1]
+        rng = rngs[i]
+        int *= label
+        val *= ' '^length(label) * center(rng[2], width = w)
+        if i < length(rngs) && length(int * labels[i]) + 2w > LINE_WIDTH
+            int *= center(rng[1][1:1], width = w)
+            append!(lines, [center(int)])
+            append!(lines, [center(val)])
+            int = center(rng[1][length(rng[1]):length(rng[1])], width = w)
+            val = center(rng[2], width = w)
         else
-            rng = rngs[Int64(ceil(i / 2))]
             int *= center(rng[1], width = w)
-            val *= center(rng[2], width = w)
         end
     end
-    if length(int) > LINE_WIDTH
-        lines = []
-        i = 0
-        while (i)LINE_WIDTH <= length(int)
-            append!(
-                lines,
-                [
-                    int[(i)LINE_WIDTH+1:min((i + 1)LINE_WIDTH, length(int))],
-                    val[(i)LINE_WIDTH+1:min((i + 1)LINE_WIDTH, length(val))],
-                    "",
-                ],
-            )
-            i += 1
-        end
-        join(lines[1:length(lines)-1], "\n")
-    else
-        center(int, val)
-    end
+    append!(lines, [center(int)])
+    append!(lines, [center(val)])
+    join(lines, "\n")
 end
 
 # Centers text within width spaces

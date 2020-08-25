@@ -193,7 +193,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
             # Continue casework
             printfT(
                 "Note",
-                "The only cases that need to be considered deal with everyone having either $W or $V shs, so:",
+                "The remaining cases deal with everyone having either $W or $V shs, so:",
                 "",
                 "$(W)·s_$W + $(V)·s_$V = $(2m)  (total shs)",
                 "s_$W + s_$V = $s  (total students)",
@@ -297,7 +297,7 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
             (vMin, vMax, sMin, sMax) = (W, V, sW, sV)
             (i, j, k, l) = (y1, x1, xF, yF)
             (rngMin, rngMax, rngS, rngL) =
-                ((yF, alpha1), (alphaF, yF), (alphaF, y1), (x1, xF))
+                ((yF, alpha1), (alphaF, y1), (alphaF, y1), (x1, xF))
         end
         numMin = (vMin)sMin
 
@@ -479,21 +479,13 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
                         solution =
                             ["The system has no non-negative integer solutions, so Case 5 is impossible"]
                     end
-
-                    if output > 1
-                        printfT(
-                            "Midpoint Analysis II",
-                            "Since |$A| = |$B|, we can set up the following system of equations:",
-                            "",
-                            equations...,
-                            "",
-                            solution...,
-                        )
-                    end
                 end
 
                 if length(solution) > 1
-                    output > 1 && printHeader("CASE 5: GAP ANALYSIS")
+                    if output > 1
+                        printf("Midpoint Analysis inconclusive, continuing to Gap Analysis", line=true)
+                        printHeader("CASE 5: GAP ANALYSIS")
+                    end
 
                     upChr = join('A':'Z')
                     (loChr, loOrd) = (join('z':-1:'a'), 1)
@@ -821,6 +813,17 @@ function vgap(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
                         end
                     end
 
+                else 
+                    if output > 1
+                        printfT(
+                            "Midpoint Analysis II",
+                            "Since |$A| = |$B|, we can set up the following system of equations:",
+                            "",
+                            equations...,
+                            "",
+                            solution...,
+                        )
+                    end
                 end
             else
                 if output > 1

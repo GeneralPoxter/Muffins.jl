@@ -158,7 +158,7 @@ function vhbm(a, d, k, X; output::Int64 = 2)
     if X < a // 3
         pre = false
         if output > 0
-            printf("Bad input, VHBM failed. X is less than a/3 ($(a//3)).")
+            printf("Bad input, VHBM failed. X is less than a/3 ($(formatFrac(a//3))).")
             printEnd()
         end
         return false
@@ -222,8 +222,6 @@ function vhbm(a, d, k, X; output::Int64 = 2)
         formatFrac((2 * d * k + X) // comden, den)
         bound1S = formatFrac((d * k + a - X) // comden, den)
         int5 = formatFrac((d * k + a // 2) // comden, den)
-        bound = formatFrac(a//3)
-
 
         if output > 1
             printHeader("INTERVAL DIAGRAM:")
@@ -238,7 +236,7 @@ function vhbm(a, d, k, X; output::Int64 = 2)
                     labels = ["$(V)s_$V $V-shs", "0", "$(V-1)s_$(V-1) $(V-1)-shs"],
                 ),
             )
-            printf("The assumption that X ≥ $bound ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
+            printf("The assumption that X ≥ $(formatFrac(a//3)) ensures that the interval of $V-shares and $(V-1) shares do not intersect.")
             printLine()
 
 

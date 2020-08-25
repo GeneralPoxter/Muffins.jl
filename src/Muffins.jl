@@ -69,14 +69,23 @@ function muffins(m::Int64, s::Int64; output::Int64 = 1)
     end
     disp && println("\nOptimal α derived by $method ⮥")
 
-    procedures = findproc(m, s, alpha, output = output)[2]
+    procedures = findproc(m, s, alpha, output = 0)[2]
     if procedures == Nothing
         disp &&
             println("\nFindProc could not confirm optimal α to be a lower bound\nmuffins($m,$s) failed")
-        return 1 // 1
+        for i in vcat(numerator(alpha)-1:-1:denominator(alpha)//3, denominator(alpha) // 3)
+            lowerB = i // denominator(alpha)
+            if findproc(m, s, lowerB, output = 0)[2] != Nothing
+                findproc(m, s, lowerB, output = output)
+                disp &&
+                    println("\nFindProc found $(numerator(lowerB))/$(denominator(lowerB)) to be a lower bound for muffins($m,$s) ⮥")
+                return lowerB
+            end
+        end
+        return 1 // 3
     end
 
-    #findproc(m, s, alpha, output=output)
+    findproc(m, s, alpha, output = output)
     disp && println("\nFindProc found optimal α to be a lower bound as well ⮥")
     disp && println("\nmuffins($m,$s) = $(numerator(alpha))/$(denominator(alpha))")
     alpha

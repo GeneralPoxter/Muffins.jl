@@ -188,7 +188,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
             # Continue casework
             printfT(
                 "Note",
-                "The only cases that need to be considered deal with everyone having either $W or $V shs, so:",
+                "The remaining cases deal with everyone having either $W or $V shs, so:",
                 "",
                 "$(W)·s_$W + $(V)·s_$V = $(2m)  (total shs)",
                 "s_$W + s_$V = $s  (total students)",
@@ -292,7 +292,7 @@ function vmid(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
             (vMin, vMax, sMin, sMax) = (W, V, sW, sV)
             (i, j, k, l) = (y1, x1, xF, yF)
             (rngMin, rngMax, rngS, rngL) =
-                ((yF, alpha1), (alphaF, yF), (alphaF, y1), (x1, xF))
+                ((yF, alpha1), (alphaF, y1), (alphaF, y1), (x1, xF))
         end
         numMin = (vMin)sMin
 

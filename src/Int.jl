@@ -185,7 +185,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
             # Continue casework
             printfT(
                 "Note",
-                "The only cases that need to be considered deal with everyone having either $W or $V shs, so:",
+                "The remaining cases deal with everyone having either $W or $V shs, so:",
                 "",
                 "$(W)·s_$W + $(V)·s_$V = $(2m)  (total shs)",
                 "s_$W + s_$V = $s  (total students)",
@@ -293,7 +293,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
             (lim1, lim2) = (diff, (vMin)sMin)
             (i, j, k, l) = (y1, x1, xF, yF)
             (rngMin, rngMax, rngS, rngL) =
-                ((yF, alpha1), (alphaF, yF), (alphaF, y1), (x1, xF))
+                ((yF, alpha1), (alphaF, y1), (alphaF, y1), (x1, xF))
         end
         numMin = (vMin)sMin
 
@@ -353,7 +353,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
                     "Case 5.2",
                     "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                     "",
-                    "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim1",
+                    "This is impossible because $(f+1) × $sMax = $((f+1)sMax) ≥ $lim1",
                 )
             end
         elseif lowerB >= m // s
@@ -370,7 +370,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
                     "Case 5.2",
                     "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
                     "",
-                    "This is impossible because $(g+1)×$sMax = $((g+1)sMax) ≥ $lim2",
+                    "This is impossible because $(g+1) × $sMax = $((g+1)sMax) ≥ $lim2",
                 )
             end
         else
@@ -379,7 +379,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
                     "Bound # of large $vMax-shs",
                     "All $sMax $vMax-sh students have at least $(f+1) large $vMax-shs",
                     "",
-                    "This is impossible because $(f+1)×$sMax = $((f+1)sMax) ≥ $lim1",
+                    "This is impossible because $(f+1) × $sMax = $((f+1)sMax) ≥ $lim1",
                 )
                 printfT(
                     "Negation of prev. bound",
@@ -394,7 +394,7 @@ function vint(m::Int64, s::Int64, alpha::Rational{Int64}; output::Int64 = 2)
                     "Bound # of small $vMax-shs",
                     "All $sMax $vMax-sh students have at least $(g+1) small $vMax-shs",
                     "",
-                    "This is impossible because $(g+1)×$sMax = $((g+1)sMax) ≥ $lim2",
+                    "This is impossible because $(g+1) × $sMax = $((g+1)sMax) ≥ $lim2",
                 )
                 printfT(
                     "Negation of prev. bound",

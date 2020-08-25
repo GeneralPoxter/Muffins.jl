@@ -34,7 +34,7 @@ To solve the Muffin Problem for `m` muffins and `s` students:
 ```julia
 Muffins.muffins(m, s)
 ```  
-An upper bound `α` for `muffins(m, s)` is found by testing `(m, s)` on all the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **Find Procedure**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`. Else, the method returns `1//1`.
+An upper bound `α` for `muffins(m, s)` is found by testing `(m, s)` on all the bounding methods in the package (see **Bounding methods**). The upper bound `α` is then verified to be a lower bound for `muffins(m, s)` by finding a procedure where `α` is the smallest muffin piece cut (see **Find Procedure**). If all tests are conclusive, `α` is returned as the solution to `muffins(m, s)`. Else, the method returns a lower bound for `muffins(m,s)` with a verifiable procedure.
 
 ### Bounding methods
 Given `(m, s)`, each bounding method finds and returns the upper bound `α` for `muffins(m, s)`.
@@ -123,8 +123,8 @@ All methods except for **Matrix Solve** can display their results and justify th
 + Set `output` to `1` for result display without proofs
 + Set `output` to `2` for detailed proofs and result display  
 
-For example, `Muffins.half(m, s, output=1)` will display the results of the Half Method without a proof.  
-By default, `output` is set to `1` for `Muffins.muffins(m, s)` and `2` for other asterisk methods.
+By default, `output` is set to `1` for `Muffins.muffins(m, s)` and `2` for all other methods with output.
+For example, while `Muffins.muffins(m, s)` displays results without proofs, `Muffins.muffins(m, s, output=2)` displays results with proofs.
 
 ## Accuracy
 Except for **Matrix Solve** and the cases listed [here](https://docs.google.com/spreadsheets/d/1ruZvlS14-7J_UREqOEvMM_SHVeAgZnEUP0GWayFXHf0/edit?usp=sharing), all **Muffins.jl** methods are correct for all cases listed in [test.txt](src/test.txt).  
