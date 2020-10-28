@@ -131,4 +131,4 @@ Except for **Matrix Solve** and the cases listed [here](https://docs.google.com/
 The user is free to test **Muffins.jl** by customizing and running [test.jl](src/test.jl) (this would require accessing and modifying files in the package).
 
 ## Development
-**Muffins.jl** was developed by [Antara Hebbar](https://github.com/antarahebbar) and [Jason Liu](https://github.com/GeneralPoxter) during the summer of 2020.
+**Muffins.jl** was developed by [Antara Hebbar](https://github.com/antarahebbar) and [Jason Liu](https://github.com/GeneralPoxter) during the summer of 2020 under the mentorship of Professor William Gasarch.
