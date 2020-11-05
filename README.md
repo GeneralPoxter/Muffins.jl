@@ -11,7 +11,7 @@ For a larger, more advanced Julia package to solve more Muffin Problems, see [Th
 
 ## Requirements
 **Muffins.jl** is built and tested for Julia v1.4.  
-Download the appropriate version of Julia **[here](https://julialang.org/downloads/)**.
+Download the appropriate version of Julia [here](https://julialang.org/downloads/).
 
 ## Installation
 Run `julia` in the terminal to open the Julia REPL and load the package by entering the following commands after the `julia>` prompt:
