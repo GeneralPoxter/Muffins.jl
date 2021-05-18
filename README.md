@@ -5,7 +5,7 @@
 
 The Muffin Problem was first proposed by Alan Frank in 2011. Algorithms and solution methods were later extensively developed in *The Muffin Book* (2019), a collaboration between William Gasarch, Erik Metz, Jacob Prinz, and Daniel Smolyak, among others.
 
-The theorems, conjectures, and procedures referenced by **Muffins.jl** are expanded upon and proven on the [Muffin Website](https://www.cs.umd.edu/users/gasarch/MUFFINS/muffins.html) and in *[The Muffin Book](https://books.google.com/books/about/Mathematical_Muffin_Morsels.html?id=UwkazAEACAAJ&source=kp_book_description)*.
+The theorems, conjectures, and procedures referenced by **Muffins.jl** are expanded upon and proven on the [Muffin Website](https://www.cs.umd.edu/users/gasarch/MUFFINS/muffins.html) and in *[The Muffin Book](https://books.google.com/books?id=pdrrDwAAQBAJ)*.
 
 For a larger, more advanced Julia package to solve more Muffin Problems, see [The Muffin Package](https://github.com/swarman2/The-Muffin-Package), developed by Stephanie Warman.
 
